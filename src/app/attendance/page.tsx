@@ -66,11 +66,7 @@ export default function AttendancePage() {
   };
   
   const getInitials = (name: string) => {
-    const names = name.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[names.length-1][0]}`;
-    }
-    return names[0][0];
+    return name ? name.charAt(0) : '';
   }
 
   const staffOnSelectedDate = date ? staff.map(s => {
@@ -164,7 +160,7 @@ export default function AttendancePage() {
           </Card>
         </div>
 
-        <div className="md:col-span-1">
+        <div className="md:col-span-1 md:col-start-1 md:row-start-2">
           {date && (
             <Card>
                 <CardHeader>
