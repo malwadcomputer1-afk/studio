@@ -94,97 +94,94 @@ export default function AttendancePage() {
         title="Attendance Tracking"
         description="Select a date to view and manage daily staff attendance."
       />
-      <div className="grid md:grid-cols-3 gap-6 items-start">
-        <div className="md:col-span-1 flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
+        <Card>
+            <CardContent className="p-0 flex justify-center">
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
+                    modifiers={{ 
+                        present: daysWithSomePresent
+                    }}
+                    modifiersClassNames={{ 
+                        present: 'has-attendance-dot'
+                    }}
+                />
+            </CardContent>
+        </Card>
+        <div className="grid md:grid-cols-3 gap-6 items-start">
+            <div className="md:col-span-1">
+                {date && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap gap-2">
+                        {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
+                            (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
+                                attendanceSummary[status] > 0 &&
+                                <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' || status === 'Overtime' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
+                                    <span>{status}</span>
+                                    <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
+                                </Badge>
+                            ))
+                        ) : (
+                            <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
+                        )}
+                    </CardContent>
+                </Card>
+                )}
+            </div>
+            <div className="md:col-span-2">
             <Card>
-                <CardHeader className="bg-destructive text-destructive-foreground rounded-t-lg p-4">
-                    <CardTitle className="text-center">Calendar</CardTitle>
+                <CardHeader>
+                <CardTitle>
+                    Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
+                </CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
-                        modifiers={{ 
-                            present: daysWithSomePresent,
-                            weekend: day => day.getDay() === 0 || day.getDay() === 6
-                        }}
-                        modifiersClassNames={{ 
-                            present: 'has-attendance-dot',
-                            weekend: 'text-destructive'
-                        }}
-                    />
+                <CardContent>
+                <div className="space-y-4">
+                    {staff.map((s) => (
+                    <div
+                        key={s.id}
+                        className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
+                    >
+                        <div className="flex items-center gap-4">
+                            <Avatar>
+                                <AvatarImage src={`https://i.pravatar.cc/40?u=${s.id}`} />
+                                <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-semibold">{s.name}</p>
+                                <p className="text-sm text-muted-foreground">{s.role}</p>
+                            </div>
+                        </div>
+
+                        <Select
+                        value={getAttendanceStatus(s.id)}
+                        onValueChange={(status: AttendanceStatus) =>
+                            handleAttendanceChange(s.id, status)
+                        }
+                        disabled={!date}
+                        >
+                        <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="Set status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Present">Present</SelectItem>
+                            <SelectItem value="Absent">Absent</SelectItem>
+                            <SelectItem value="Half-Day">Half-Day</SelectItem>
+                            <SelectItem value="Overtime">Overtime</SelectItem>
+                        </SelectContent>
+                        </Select>
+                    </div>
+                    ))}
+                </div>
                 </CardContent>
             </Card>
-            {date && (
-              <Card>
-                  <CardHeader>
-                      <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-wrap gap-2">
-                      {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
-                        (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
-                            attendanceSummary[status] > 0 &&
-                            <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' || status === 'Overtime' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
-                                <span>{status}</span>
-                                <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
-                            </Badge>
-                        ))
-                      ) : (
-                        <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
-                      )}
-                  </CardContent>
-              </Card>
-            )}
-        </div>
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {staff.map((s) => (
-                  <div
-                    key={s.id}
-                    className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
-                  >
-                    <div className="flex items-center gap-4">
-                        <Avatar>
-                            <AvatarImage src={`https://i.pravatar.cc/40?u=${s.id}`} />
-                            <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-semibold">{s.name}</p>
-                            <p className="text-sm text-muted-foreground">{s.role}</p>
-                        </div>
-                    </div>
-
-                    <Select
-                      value={getAttendanceStatus(s.id)}
-                      onValueChange={(status: AttendanceStatus) =>
-                        handleAttendanceChange(s.id, status)
-                      }
-                      disabled={!date}
-                    >
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Set status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Present">Present</SelectItem>
-                        <SelectItem value="Absent">Absent</SelectItem>
-                        <SelectItem value="Half-Day">Half-Day</SelectItem>
-                        <SelectItem value="Overtime">Overtime</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
         </div>
       </div>
     </>
