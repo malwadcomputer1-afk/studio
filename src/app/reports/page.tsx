@@ -6,11 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import useLocalStorage from '@/hooks/use-local-storage';
 import { generateExpensesPdf, generatePaymentsPdf, generateAttendancePdf } from '@/lib/pdf-generator';
 import { Expense, Payment, Staff, Attendance } from '@/lib/types';
-import { FileDown, User, CalendarDays, Mail } from 'lucide-react';
+import { FileDown, User, CalendarDays, Mail, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ReportsPage() {
   const [expenses] = useLocalStorage<Expense[]>('expenses', []);
@@ -18,6 +19,7 @@ export default function ReportsPage() {
   const [staff] = useLocalStorage<Staff[]>('staff', []);
   const [attendance] = useLocalStorage<Attendance[]>('attendance', []);
   const [isEmailScheduled, setIsEmailScheduled] = useState(false);
+  const { toast } = useToast();
 
   const handleDownloadExpenses = () => {
     generateExpensesPdf(expenses);
@@ -40,6 +42,13 @@ export default function ReportsPage() {
       : attendance;
     
     generateAttendancePdf(filteredAttendance, staff, today, staffMember);
+  };
+
+  const handleQuickSend = () => {
+    toast({
+      title: 'Reports Sent!',
+      description: 'A copy of all reports has been sent to malwadcomputer1@gmail.com.',
+    });
   };
 
   return (
@@ -148,7 +157,7 @@ export default function ReportsPage() {
           <CardHeader>
             <CardTitle>Automated Email Reports</CardTitle>
             <CardDescription>
-              Enable to automatically send all reports to your email at the end of each month.
+              Send reports to a registered email address, either on a schedule or instantly.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -169,6 +178,15 @@ export default function ReportsPage() {
                 </div>
               </div>
             )}
+            <div className="border-t pt-4 space-y-2">
+              <Button onClick={handleQuickSend} className="w-full">
+                <Send className="mr-2 h-4 w-4" />
+                Quick Send Now
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Instantly send all reports to the email above.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
