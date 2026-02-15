@@ -5,7 +5,7 @@ interface StatCardProps {
     title: string;
     value: string;
     icon: LucideIcon;
-    description: string;
+    description?: string;
 }
 
 export function StatCard({ title, value, icon: Icon, description }: StatCardProps) {
@@ -16,8 +16,8 @@ export function StatCard({ title, value, icon: Icon, description }: StatCardProp
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <div className="text-3xl font-bold">{value}</div>
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </CardContent>
     </Card>
   )

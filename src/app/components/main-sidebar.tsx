@@ -7,30 +7,35 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   Users,
   CalendarCheck,
-  ClipboardPenLine,
+  Calculator,
+  CreditCard,
+  ClipboardList,
+  CalendarDays,
+  Sprout,
   Landmark,
-  Tractor,
-  DollarSign,
+  BarChart,
   Leaf,
-  FileDown,
 } from "lucide-react";
 import Link from "next/link";
 
 const menuItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/staff", label: "Staff", icon: Users },
-  { href: "/attendance", label: "Attendance", icon: CalendarCheck },
-  { href: "/activities", label: "Activities", icon: Tractor },
-  { href: "/expenses", label: "Expenses", icon: DollarSign },
-  { href: "/salary", label: "Salary", icon: ClipboardPenLine },
-  { href: "/payments", label: "Payments", icon: Landmark },
-  { href: "/reports", label: "Reports", icon: FileDown },
+    { href: "/", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/staff", label: "Staff", icon: Users },
+    { href: "/attendance", label: "Attendance", icon: CalendarCheck },
+    { href: "/salary", label: "Salary", icon: Calculator },
+    { href: "/payments", label: "Payments", icon: CreditCard },
+    { href: "/activities", label: "Activities", icon: ClipboardList },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays },
+    { href: "/crops-and-fields", label: "Crops & Fields", icon: Sprout },
+    { href: "/expenses", label: "Expenses", icon: Landmark },
+    { href: "/reports", label: "Reports", icon: BarChart },
 ];
 
 export function MainSidebar({ pathname }: { pathname: string }) {
@@ -43,7 +48,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
                <Leaf className="w-6 h-6 text-primary" />
              </Link>
           </Button>
-          <h1 className="text-xl font-headline font-semibold">Verdant</h1>
+          <h1 className="text-xl font-headline font-semibold">FarmFlow</h1>
           <div className="grow" />
           <SidebarTrigger />
         </div>
@@ -66,6 +71,12 @@ export function MainSidebar({ pathname }: { pathname: string }) {
           ))}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex items-center gap-2 p-2 text-xs text-sidebar-foreground/70">
+            <Leaf className="w-4 h-4" />
+            <span>FarmFlow v1.0</span>
+        </div>
+      </SidebarFooter>
     </>
   );
 }

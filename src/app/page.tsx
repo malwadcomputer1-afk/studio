@@ -4,14 +4,14 @@ import { StatCard } from '@/app/components/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialData } from '@/lib/mock-data';
-import { Activity, Attendance, Expense, Payment, Staff } from '@/lib/types';
+import { Activity, Attendance, Expense, Staff } from '@/lib/types';
 import {
   Users,
   CalendarCheck,
-  DollarSign,
-  Tractor,
-  TrendingUp,
-  TrendingDown,
+  CreditCard,
+  Sprout,
+  ClipboardList,
+  Landmark,
 } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 
@@ -20,10 +20,6 @@ export default function DashboardPage() {
   const [attendance] = useLocalStorage<Attendance[]>(
     'attendance',
     initialData.attendance
-  );
-  const [payments] = useLocalStorage<Payment[]>(
-    'payments',
-    initialData.payments
   );
   const [activities] = useLocalStorage<Activity[]>(
     'activities',
@@ -39,6 +35,8 @@ export default function DashboardPage() {
     (a) => a.status === 'Present'
   ).length;
 
+  const todayActivitiesCount = activities.filter((a) => isToday(new Date(a.date))).length;
+
   const totalExpensesThisMonth = expenses
     .filter(
       (e) => new Date(e.date).getMonth() === new Date().getMonth()
@@ -51,37 +49,44 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="Dashboard" description="Welcome to Verdant Farm Manager." />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <PageHeader
+        title="Welcome to FarmFlow"
+        description={`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
+      />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Staff"
           value={staff.length.toString()}
           icon={Users}
-          description="Number of active staff members"
         />
         <StatCard
           title="Present Today"
-          value={`${presentToday} / ${staff.length}`}
+          value={`${presentToday}`}
           icon={CalendarCheck}
-          description="Staff present today"
         />
         <StatCard
-          title="Total Payments"
-          value={payments.length.toString()}
-          icon={DollarSign}
-          description="Salary payments recorded"
+          title="Pending Payments"
+          value={"0"}
+          icon={CreditCard}
         />
         <StatCard
-          title="Upcoming Activities"
-          value={
-            activities.filter((a) => new Date(a.date) >= new Date()).length.toString()
-          }
-          icon={Tractor}
-          description="Planned farm activities"
+          title="Active Crops"
+          value={"0"}
+          icon={Sprout}
+        />
+        <StatCard
+          title="Today's Activities"
+          value={todayActivitiesCount.toString()}
+          icon={ClipboardList}
+        />
+        <StatCard
+          title="Month Expenses"
+          value={`₹${totalExpensesThisMonth.toLocaleString()}`}
+          icon={Landmark}
         />
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-6">
-        <Card className="lg:col-span-4">
+      <div className="grid gap-4 mt-6">
+        <Card className="lg:col-span-7">
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
           </CardHeader>
@@ -90,8 +95,8 @@ export default function DashboardPage() {
               {recentActivities.length > 0 ? (
                 recentActivities.map((activity) => (
                   <div key={activity.id} className="flex items-start gap-4">
-                    <div className="bg-secondary p-2 rounded-full">
-                       <Tractor className="h-5 w-5 text-secondary-foreground" />
+                    <div className="bg-secondary p-2 rounded-lg">
+                       <ClipboardList className="h-5 w-5 text-secondary-foreground" />
                     </div>
                     <div>
                       <p className="font-semibold">{activity.title}</p>
@@ -102,38 +107,8 @@ export default function DashboardPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-muted-foreground">No recent activities logged.</p>
+                <p className="text-muted-foreground">No activities recorded yet. Start by adding staff and logging daily activities.</p>
               )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Financials at a Glance</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6">
-             <div className="flex items-center gap-4">
-                <div className="bg-destructive/20 p-3 rounded-full">
-                    <TrendingDown className="h-6 w-6 text-destructive" />
-                </div>
-                <div>
-                    <p className="text-muted-foreground">Expenses This Month</p>
-                    <p className="text-2xl font-bold">
-                        {totalExpensesThisMonth.toLocaleString()}
-                    </p>
-                </div>
-            </div>
-            <div className="flex items-center gap-4">
-                <div className="bg-primary/20 p-3 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                    <p className="text-muted-foreground">Total Payments Made</p>
-                    <p className="text-2xl font-bold">
-                        {(payments
-                        .reduce((sum, p) => sum + p.amount, 0)).toLocaleString()}
-                    </p>
-                </div>
             </div>
           </CardContent>
         </Card>
