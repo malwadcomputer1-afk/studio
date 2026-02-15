@@ -30,9 +30,10 @@ type StaffFormValues = z.infer<typeof formSchema>;
 interface StaffFormProps {
   staff?: Staff;
   onSubmit: (values: StaffFormValues & { hourlyRate: number }) => void;
+  onCancel?: () => void;
 }
 
-export function StaffForm({ staff, onSubmit }: StaffFormProps) {
+export function StaffForm({ staff, onSubmit, onCancel }: StaffFormProps) {
   const form = useForm<StaffFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: staff || {
@@ -51,7 +52,7 @@ export function StaffForm({ staff, onSubmit }: StaffFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -117,7 +118,10 @@ export function StaffForm({ staff, onSubmit }: StaffFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">{staff ? 'Save Changes' : 'Add Staff'}</Button>
+        <div className="flex justify-end gap-2 pt-4">
+            {onCancel && <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>}
+            <Button type="submit">{staff ? 'Save Changes' : 'Add Staff'}</Button>
+        </div>
       </form>
     </Form>
   );

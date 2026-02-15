@@ -8,8 +8,9 @@ import { DataTable } from '@/app/staff/components/data-table';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PaymentForm } from './components/payment-form';
+import { PaymentList } from './components/payment-list';
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useLocalStorage<Payment[]>('payments', initialData.payments);
@@ -48,33 +49,38 @@ export default function PaymentsPage() {
         title="Payment Tracking"
         description="Record and view salary payments."
       >
-        <div className="flex items-center gap-2">
-          <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
-            <DialogTrigger asChild>
-              <Button onClick={() => { setEditingPayment(undefined); setOpen(true); }}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Payment
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{editingPayment ? 'Edit Payment' : 'Add New Payment'}</DialogTitle>
-              </DialogHeader>
-              <PaymentForm 
-                staff={staff}
-                onSubmit={handleFormSubmit}
-                onCancel={closeDialog}
-                payment={editingPayment} 
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+        <Button onClick={() => { setEditingPayment(undefined); setOpen(true); }}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Payment
+        </Button>
       </PageHeader>
       
-      <DataTable 
-        columns={columns} 
-        data={payments} 
-      />
+      <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{editingPayment ? 'Edit Payment' : 'Add New Payment'}</DialogTitle>
+            </DialogHeader>
+            <PaymentForm 
+              staff={staff}
+              onSubmit={handleFormSubmit}
+              onCancel={closeDialog}
+              payment={editingPayment} 
+            />
+          </DialogContent>
+      </Dialog>
+      
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <PaymentList payments={payments} staff={staff} onEdit={handleEdit} onDelete={handleDelete} />
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <DataTable 
+          columns={columns} 
+          data={payments} 
+        />
+      </div>
     </>
   );
 }

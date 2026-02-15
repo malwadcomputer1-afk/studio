@@ -9,7 +9,8 @@ import { getColumns } from './components/columns';
 import { DataTable } from '@/app/staff/components/data-table';
 import { useState } from 'react';
 import { ActivityForm, ActivityFormValues } from './components/activity-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ActivityList } from './components/activity-list';
 
 export default function ActivitiesPage() {
   const [activities, setActivities] = useLocalStorage<Activity[]>('activities', initialData.activities);
@@ -42,17 +43,18 @@ export default function ActivitiesPage() {
   }
 
   const columns = getColumns({ onEdit: handleEdit, onDelete: handleDelete });
+  const sortedActivities = activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <>
       <PageHeader title="Activity Notes" description="Log your daily activities and notes here.">
-        <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
-          <DialogTrigger asChild>
-            <Button onClick={() => { setEditingActivity(undefined); setOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Note
-            </Button>
-          </DialogTrigger>
+        <Button onClick={() => { setEditingActivity(undefined); setOpen(true); }}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Note
+        </Button>
+      </PageHeader>
+      
+      <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
           <DialogContent className="sm:max-w-[525px]">
             <DialogHeader>
               <DialogTitle>{editingActivity ? 'Edit Note' : 'Add New Note'}</DialogTitle>
@@ -64,12 +66,20 @@ export default function ActivitiesPage() {
             />
           </DialogContent>
         </Dialog>
-      </PageHeader>
-      <DataTable 
-        columns={columns} 
-        data={activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
-        filterColumn={{id: 'title', placeholder: 'Filter by title...'}}
-      />
+
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <ActivityList activities={sortedActivities} onEdit={handleEdit} onDelete={handleDelete} />
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <DataTable 
+          columns={columns} 
+          data={sortedActivities}
+          filterColumn={{id: 'title', placeholder: 'Filter by title...'}}
+        />
+      </div>
     </>
   );
 }

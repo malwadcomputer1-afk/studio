@@ -11,9 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useState } from 'react';
-import { StaffForm } from './staff-form';
 
 type StaffColumnsProps = {
   onEdit: (staff: Staff) => void;
@@ -48,15 +45,9 @@ export const columns = ({
     id: 'actions',
     cell: ({ row }) => {
       const staff = row.original;
-      const [open, setOpen] = useState(false);
-      
-      const handleEdit = (updatedStaff: Staff) => {
-        onEdit(updatedStaff);
-        setOpen(false);
-      }
 
       return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <div className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -70,9 +61,9 @@ export const columns = ({
                 Copy Contact
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DialogTrigger asChild>
-                <DropdownMenuItem>Edit</DropdownMenuItem>
-              </DialogTrigger>
+              <DropdownMenuItem onClick={() => onEdit(staff)}>
+                Edit
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"
                 onClick={() => onDelete(staff.id)}
@@ -81,16 +72,7 @@ export const columns = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Staff Member</DialogTitle>
-            </DialogHeader>
-            <StaffForm
-              staff={staff}
-              onSubmit={(values) => handleEdit({ ...staff, ...values })}
-            />
-          </DialogContent>
-        </Dialog>
+        </div>
       );
     },
   },

@@ -9,7 +9,8 @@ import { getColumns } from './components/columns';
 import { DataTable } from '@/app/staff/components/data-table';
 import { useState } from 'react';
 import { ExpenseForm } from './components/expense-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ExpenseList } from './components/expense-list';
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useLocalStorage<Expense[]>('expenses', initialData.expenses);
@@ -44,13 +45,13 @@ export default function ExpensesPage() {
   return (
     <>
       <PageHeader title="Expense Tracking" description="Record and categorize all farm-related expenses.">
-        <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
-          <DialogTrigger asChild>
-            <Button onClick={() => { setEditingExpense(undefined); setOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Expense
-            </Button>
-          </DialogTrigger>
+        <Button onClick={() => { setEditingExpense(undefined); setOpen(true); }}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Expense
+        </Button>
+      </PageHeader>
+      
+      <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>
@@ -61,13 +62,21 @@ export default function ExpensesPage() {
               expense={editingExpense} 
             />
           </DialogContent>
-        </Dialog>
-      </PageHeader>
-      <DataTable 
-        columns={columns} 
-        data={expenses} 
-        filterColumn={{id: 'service', placeholder: 'Filter by service...'}}
-      />
+      </Dialog>
+
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <ExpenseList expenses={expenses} onEdit={handleEdit} onDelete={handleDelete} />
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <DataTable 
+          columns={columns} 
+          data={expenses} 
+          filterColumn={{id: 'service', placeholder: 'Filter by service...'}}
+        />
+      </div>
     </>
   );
 }

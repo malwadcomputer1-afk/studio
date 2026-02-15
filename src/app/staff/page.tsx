@@ -9,51 +9,72 @@ import { columns } from './components/columns';
 import { DataTable } from './components/data-table';
 import { useState } from 'react';
 import { StaffForm } from './components/staff-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { StaffList } from './components/staff-list';
 
 export default function StaffPage() {
   const [staff, setStaff] = useLocalStorage<Staff[]>('staff', initialData.staff);
-  const [open, setOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<Staff | undefined>(undefined);
 
-  const addStaffMember = (newStaffMember: Omit<Staff, 'id'>) => {
-    setStaff([...staff, { ...newStaffMember, id: crypto.randomUUID() }]);
-    setOpen(false);
+  const handleFormSubmit = (values: Omit<Staff, 'id'>) => {
+    if (editingStaff) {
+      setStaff(staff.map((s) => (s.id === editingStaff.id ? { ...editingStaff, ...values } : s)));
+    } else {
+      setStaff([...staff, { ...values, id: crypto.randomUUID() }]);
+    }
+    closeDialog();
   };
 
-  const updateStaffMember = (updatedStaffMember: Staff) => {
-    setStaff(
-      staff.map((s) => (s.id === updatedStaffMember.id ? updatedStaffMember : s))
-    );
+  const handleEdit = (staffMember: Staff) => {
+    setEditingStaff(staffMember);
+    setIsDialogOpen(true);
   };
   
-  const deleteStaffMember = (staffId: string) => {
+  const handleDelete = (staffId: string) => {
     setStaff(staff.filter((s) => s.id !== staffId));
   }
 
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingStaff(undefined);
+  }
 
   return (
     <>
       <PageHeader title="Staff Management" description="Manage your farm staff details.">
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Staff
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Staff Member</DialogTitle>
-            </DialogHeader>
-            <StaffForm onSubmit={addStaffMember} />
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => { setEditingStaff(undefined); setIsDialogOpen(true); }}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Staff
+        </Button>
       </PageHeader>
-      <DataTable 
-        columns={columns({ onEdit: updateStaffMember, onDelete: deleteStaffMember })} 
-        data={staff} 
-        filterColumn={{id: 'name', placeholder: 'Filter by name...'}}
-      />
+
+      <Dialog open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && closeDialog()}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}</DialogTitle>
+          </DialogHeader>
+          <StaffForm 
+            onSubmit={handleFormSubmit}
+            onCancel={closeDialog}
+            staff={editingStaff}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Mobile view */}
+      <div className="md:hidden">
+        <StaffList staff={staff} onEdit={handleEdit} onDelete={handleDelete} />
+      </div>
+
+      {/* Desktop view */}
+      <div className="hidden md:block">
+        <DataTable 
+          columns={columns({ onEdit: handleEdit, onDelete: handleDelete })} 
+          data={staff} 
+          filterColumn={{id: 'name', placeholder: 'Filter by name...'}}
+        />
+      </div>
     </>
   );
 }
