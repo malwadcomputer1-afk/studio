@@ -149,7 +149,7 @@ export default function AttendancePage() {
                   {staff.map((s) => (
                   <div
                       key={s.id}
-                      className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
+                      className="flex flex-col md:flex-row md:items-center md:justify-between p-2 rounded-md hover:bg-muted gap-2"
                   >
                       <div className="flex items-center gap-4">
                           <Avatar>
@@ -168,7 +168,7 @@ export default function AttendancePage() {
                       }
                       disabled={!date}
                       >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-full md:w-[140px]">
                           <SelectValue placeholder="Set status" />
                       </SelectTrigger>
                       <SelectContent>
