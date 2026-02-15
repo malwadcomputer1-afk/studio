@@ -13,7 +13,7 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string, 
     head,
     body,
     startY: 25,
-    theme: 'striped',
+    theme: 'grid',
     headStyles: { fillColor: [107, 142, 35] }, // Olive Drab
   });
 
@@ -28,8 +28,9 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string, 
 };
 
 export const generateExpensesPdf = (expenses: Expense[]) => {
-  const head = [['Service', 'Amount', 'Date']];
-  const body = expenses.map(exp => [
+  const head = [['Sr. No.', 'Service', 'Amount', 'Date']];
+  const body = expenses.map((exp, index) => [
+    index + 1,
     exp.service,
     exp.amount.toLocaleString(),
     format(new Date(exp.date), 'MMM d, yyyy'),
@@ -55,18 +56,20 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
       : `payments-report-all-${format(new Date(), 'yyyy-MM-dd')}`;
 
     const head = isSingleStaffReport
-      ? [['Notes', 'Amount', 'Date']]
-      : [['Staff Member', 'Notes', 'Amount', 'Date']];
+      ? [['Sr. No.', 'Notes', 'Amount', 'Date']]
+      : [['Sr. No.', 'Staff Member', 'Notes', 'Amount', 'Date']];
       
-    const body = payments.map(p => {
+    const body = payments.map((p, index) => {
         if (isSingleStaffReport) {
             return [
+                index + 1,
                 p.notes || '',
                 p.amount.toLocaleString(),
                 format(new Date(p.date), 'MMM d, yyyy'),
             ];
         }
         return [
+            index + 1,
             staffMap.get(p.staffId) || 'Unknown',
             p.notes || '',
             p.amount.toLocaleString(),
