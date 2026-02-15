@@ -28,11 +28,11 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string, 
 };
 
 export const generateExpensesPdf = (expenses: Expense[]) => {
-  const head = [['Date', 'Service', 'Amount']];
+  const head = [['Service', 'Amount', 'Date']];
   const body = expenses.map(exp => [
-    format(new Date(exp.date), 'MMM d, yyyy'),
     exp.service,
     exp.amount.toLocaleString(),
+    format(new Date(exp.date), 'MMM d, yyyy'),
   ]);
   
   const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
