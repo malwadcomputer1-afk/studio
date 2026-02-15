@@ -27,12 +27,9 @@ export interface Activity {
   staffIds: string[];
 }
 
-export type ExpenseCategory = 'Seeds' | 'Fertilizer' | 'Fuel' | 'Equipment' | 'Labor' | 'Other';
-
 export interface Expense {
   id: string;
   item: string;
-  category: ExpenseCategory;
   amount: number;
   date: string; // YYYY-MM-DD
 }

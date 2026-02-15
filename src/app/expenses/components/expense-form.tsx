@@ -12,15 +12,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Expense, ExpenseCategory } from '@/lib/types';
+import { Expense } from '@/lib/types';
 import { format } from 'date-fns';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const formSchema = z.object({
   item: z.string().min(2, {
     message: 'Item name must be at least 2 characters.',
   }),
-  category: z.enum(['Seeds', 'Fertilizer', 'Fuel', 'Equipment', 'Labor', 'Other']),
   amount: z.coerce.number().positive('Amount must be a positive number.'),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
 });
@@ -33,8 +31,6 @@ interface ExpenseFormProps {
   onCancel: () => void;
 }
 
-const expenseCategories: ExpenseCategory[] = ['Seeds', 'Fertilizer', 'Fuel', 'Equipment', 'Labor', 'Other'];
-
 export function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(formSchema),
@@ -43,7 +39,6 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
         amount: Number(expense.amount)
     } : {
       item: '',
-      category: 'Other',
       amount: 0,
       date: format(new Date(), 'yyyy-MM-dd'),
     },
@@ -65,30 +60,6 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
               <FormControl>
                 <Input placeholder="e.g., Corn Seeds" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {expenseCategories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

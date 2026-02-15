@@ -69,21 +69,18 @@ export const initialData: FarmData = {
     {
       id: 'exp1',
       item: 'Corn Seeds',
-      category: 'Seeds',
       amount: 500,
       date: format(subDays(today, 5), 'yyyy-MM-dd'),
     },
     {
       id: 'exp2',
       item: 'Diesel Fuel',
-      category: 'Fuel',
       amount: 150,
       date: format(subDays(today, 2), 'yyyy-MM-dd'),
     },
     {
       id: 'exp3',
       item: 'NPK Fertilizer',
-      category: 'Fertilizer',
       amount: 800,
       date: format(subDays(today, 10), 'yyyy-MM-dd'),
     },

@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
 
 
 type GetColumnsProps = {
@@ -34,16 +33,11 @@ export const getColumns = ({
     header: 'Item',
   },
   {
-    accessorKey: 'category',
-    header: 'Category',
-    cell: ({ row }) => <Badge variant="secondary">{row.getValue('category')}</Badge>
-  },
-  {
     accessorKey: 'amount',
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'));
-      return <div className="text-right font-medium">{amount.toLocaleString('en-IN')}</div>;
+      return <div className="text-right font-medium">{amount.toLocaleString()}</div>;
     },
   },
   {
