@@ -36,7 +36,7 @@ export default function DashboardPage() {
 
   const todayAttendance = attendance.filter((a) => isToday(new Date(a.date)));
   const presentToday = todayAttendance.filter(
-    (a) => a.status === 'Present' || a.status === 'Overtime'
+    (a) => a.status === 'Present'
   ).length;
 
   const totalExpensesThisMonth = expenses

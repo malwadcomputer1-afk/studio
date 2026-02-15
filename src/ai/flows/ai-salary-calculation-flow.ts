@@ -13,10 +13,9 @@ import { z } from 'genkit';
 const AttendanceRecordSchema = z.object({
   date: z.string().describe('The date of the attendance record in YYYY-MM-DD format.'),
   status: z
-    .enum(['Present', 'Absent', 'Half-Day', 'Overtime'])
+    .enum(['Present', 'Absent', 'Half-Day'])
     .describe('The attendance status for the day.'),
-  hoursWorked: z.number().optional().describe('Number of hours worked on this day, applicable for Present/Overtime.'),
-  overtimeHours: z.number().optional().describe('Number of overtime hours for the day.'),
+  hoursWorked: z.number().optional().describe('Number of hours worked on this day, applicable for Present.'),
 });
 
 const DeductionSchema = z.object({
@@ -51,7 +50,7 @@ const calculateSalaryPrompt = ai.definePrompt({
   name: 'calculateSalaryPrompt',
   input: { schema: CalculateSalaryInputSchema },
   output: { schema: CalculateSalaryOutputSchema },
-  prompt: `You are an expert payroll specialist. Calculate the final salary to be paid for {{{staffName}}} for the period from {{{dateRange.from}}} to {{{dateRange.to}}}.
+  prompt: `You are an expert payroll specialist. Your task is to calculate the final salary to be paid for {{{staffName}}} for the period from {{{dateRange.from}}} to {{{dateRange.to}}}.
 
 Base Information:
 - Staff Name: {{{staffName}}}
@@ -74,25 +73,29 @@ No other deductions.
 {{/if}}
 
 Calculation Rules:
-1.  Determine the daily salary. You can assume a standard of 260 working days per year. Daily Salary = Yearly Salary / 260.
-2.  Calculate the total earned salary for the period based on the attendance records.
-    - For each 'Present' or 'Overtime' day, add one full daily salary.
-    - For each 'Half-Day', add half of the daily salary.
-    - 'Absent' days contribute 0 to the earned salary.
-3.  The sum from step 2 is the Gross Earned Salary for the period.
-4.  From the Gross Earned Salary, subtract the 'Total Payments Already Made' in this period.
-5.  From the result, subtract the total amount of any 'Other Deductions'.
-6.  The final result is the Net Salary to be paid.
+1.  **Calculate salaries based on a 30-day month.**
+2.  **Determine Monthly Salary:** Monthly Salary = Yearly Salary / 12.
+3.  **Determine Daily Salary:** Daily Salary = Monthly Salary / 30.
+4.  **Calculate Gross Earned Salary:**
+    -   Start with the full Monthly Salary for the period.
+    -   For each 'Absent' day, subtract one full Daily Salary.
+    -   For each 'Half-Day', subtract half of a Daily Salary.
+    -   'Present' days do not change the salary from the base monthly amount.
+5.  **Calculate Net Salary:**
+    -   From the Gross Earned Salary, subtract the 'Total Payments Already Made' in this period.
+    -   From the result, subtract the total amount of any 'Other Deductions'.
+6.  **The final result is the Net Salary to be paid.**
 
 Task:
-1.  Calculate the final net salary to be paid based on the provided data and rules.
-2.  Provide a detailed, step-by-step breakdown of the calculation in the 'calculationBreakdown' field. It should include:
-    - The calculated daily salary.
-    - A summary of days worked (present, half-day, absent).
-    - The Gross Earned Salary calculation.
-    - Subtraction of payments already made.
-    - Subtraction of other deductions.
-    - The final Net Salary.
+1.  Calculate the final net salary to be paid using the rules above.
+2.  Provide a detailed, step-by-step breakdown in the 'calculationBreakdown' field, including:
+    -   Calculated Monthly Salary.
+    -   Calculated Daily Salary.
+    -   A summary of deductions for absent and half-days.
+    -   The Gross Earned Salary calculation.
+    -   Subtraction of payments already made.
+    -   Subtraction of other deductions.
+    -   The final Net Salary.
 3.  The final numeric salary must be placed in the 'calculatedSalary' field.
 `,
 });

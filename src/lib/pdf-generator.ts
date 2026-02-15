@@ -21,7 +21,7 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string, 
     const finalY = (doc as any).lastAutoTable.finalY;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Total: ${total}`, 14, finalY + 10);
+    doc.text(`Total: ${total.toLocaleString()}`, 14, finalY + 10);
   }
 
   doc.save(`${fileName}.pdf`);
@@ -129,14 +129,9 @@ export const generateAttendancePdf = (
   });
 
   if (staffMember) {
-    const summary: Record<AttendanceStatus, number> = {
-      'Present': 0,
-      'Absent': 0,
-      'Half-Day': 0,
-      'Overtime': 0,
-    };
+    const summary: Partial<Record<AttendanceStatus, number>> = {};
     attendance.forEach(att => {
-        summary[att.status]++;
+        summary[att.status] = (summary[att.status] || 0) + 1;
     });
 
     const finalY = (doc as any).lastAutoTable.finalY;
@@ -147,7 +142,7 @@ export const generateAttendancePdf = (
     doc.setFont('helvetica', 'normal');
     let summaryY = finalY + 17;
     (Object.keys(summary) as AttendanceStatus[]).forEach(status => {
-      if (summary[status] > 0) {
+      if (summary[status]) {
         doc.text(`${status}: ${summary[status]} days`, 14, summaryY);
         summaryY += 7;
       }

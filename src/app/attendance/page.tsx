@@ -122,7 +122,7 @@ export default function AttendancePage() {
                         {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
                             (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
                                 attendanceSummary[status] > 0 &&
-                                <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' || status === 'Overtime' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
+                                <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
                                     <span>{status}</span>
                                     <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
                                 </Badge>
@@ -173,7 +173,6 @@ export default function AttendancePage() {
                             <SelectItem value="Present">Present</SelectItem>
                             <SelectItem value="Absent">Absent</SelectItem>
                             <SelectItem value="Half-Day">Half-Day</SelectItem>
-                            <SelectItem value="Overtime">Overtime</SelectItem>
                         </SelectContent>
                         </Select>
                     </div>

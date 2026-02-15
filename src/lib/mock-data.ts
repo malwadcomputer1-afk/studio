@@ -38,7 +38,7 @@ export const initialData: FarmData = {
     { id: 'att2', staffId: '2', date: format(today, 'yyyy-MM-dd'), status: 'Present', hoursWorked: 8 },
     { id: 'att3', staffId: '3', date: format(today, 'yyyy-MM-dd'), status: 'Absent' },
     { id: 'att4', staffId: '1', date: format(subDays(today, 1), 'yyyy-MM-dd'), status: 'Present', hoursWorked: 8 },
-    { id: 'att5', staffId: '2', date: format(subDays(today, 1), 'yyyy-MM-dd'), status: 'Overtime', hoursWorked: 8, overtimeHours: 2 },
+    { id: 'att5', staffId: '2', date: format(subDays(today, 1), 'yyyy-MM-dd'), status: 'Present', hoursWorked: 8 },
     { id: 'att6', staffId: '3', date: format(subDays(today, 1), 'yyyy-MM-dd'), status: 'Present', hoursWorked: 8 },
     { id: 'att7', staffId: '1', date: format(subDays(today, 2), 'yyyy-MM-dd'), status: 'Half-Day', hoursWorked: 4 },
   ],

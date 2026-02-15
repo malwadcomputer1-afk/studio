@@ -8,7 +8,7 @@ export interface Staff {
   joiningDate: string;
 }
 
-export type AttendanceStatus = 'Present' | 'Absent' | 'Half-Day' | 'Overtime';
+export type AttendanceStatus = 'Present' | 'Absent' | 'Half-Day';
 
 export interface Attendance {
   id: string;
@@ -16,7 +16,6 @@ export interface Attendance {
   date: string; // YYYY-MM-DD
   status: AttendanceStatus;
   hoursWorked?: number;
-  overtimeHours?: number;
 }
 
 export interface Activity {
