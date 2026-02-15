@@ -37,7 +37,7 @@ export const columns = ({
     header: 'Yearly Salary',
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('yearlySalary'));
-      return <div className="font-medium">{amount.toLocaleString('en-IN')}</div>;
+      return <div className="font-medium">{amount.toLocaleString()}</div>;
     },
   },
   {

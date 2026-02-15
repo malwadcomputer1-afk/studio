@@ -26,12 +26,14 @@ const DeductionSchema = z.object({
 
 const CalculateSalaryInputSchema = z.object({
   staffName: z.string().describe('The name of the staff member.'),
-  hourlyRate: z.number().describe('The staff member\'s hourly rate.'),
-  standardWorkHoursPerDay: z.number().default(8).describe('Standard working hours per full day.'),
-  halfDayHours: z.number().optional().describe('Optional: Hours counted for a half-day, if different from standardWorkHoursPerDay / 2.'),
-  overtimeRateMultiplier: z.number().default(1.5).describe('Multiplier for overtime hours, e.g., 1.5 for time and a half.'),
+  yearlySalary: z.number().describe("The staff member's total yearly salary."),
+  totalPaymentsMade: z.number().describe('Total payments already made to the staff member during this period.'),
   attendanceRecords: z.array(AttendanceRecordSchema).describe('A list of daily attendance records for the pay period.'),
-  deductions: z.array(DeductionSchema).optional().describe('A list of deductions for the staff member.'),
+  dateRange: z.object({
+      from: z.string().describe('Start date of the pay period in YYYY-MM-DD format.'),
+      to: z.string().describe('End date of the pay period in YYYY-MM-DD format.'),
+  }),
+  deductions: z.array(DeductionSchema).optional().describe('A list of other deductions for the staff member.'),
 });
 export type CalculateSalaryInput = z.infer<typeof CalculateSalaryInputSchema>;
 
@@ -49,38 +51,48 @@ const calculateSalaryPrompt = ai.definePrompt({
   name: 'calculateSalaryPrompt',
   input: { schema: CalculateSalaryInputSchema },
   output: { schema: CalculateSalaryOutputSchema },
-  prompt: `You are an expert payroll specialist. Calculate the salary for {{{staffName}}}.
+  prompt: `You are an expert payroll specialist. Calculate the final salary to be paid for {{{staffName}}} for the period from {{{dateRange.from}}} to {{{dateRange.to}}}.
 
 Base Information:
 - Staff Name: {{{staffName}}}
-- Hourly Rate: {{{hourlyRate}}}
-- Standard Work Hours per Day: {{{standardWorkHoursPerDay}}}
-- Overtime Rate Multiplier: {{{overtimeRateMultiplier}}}
+- Total Yearly Salary: {{{yearlySalary}}}
+- Total Payments Already Made in this period: {{{totalPaymentsMade}}}
+- Pay Period: {{{dateRange.from}}} to {{{dateRange.to}}}
 
-Attendance Records:
+Attendance Records for the period:
 {{#each attendanceRecords}}
-- Date: {{{date}}}, Status: {{{status}}}{{#if hoursWorked}}, Hours Worked: {{{hoursWorked}}}{{/if}}{{#if overtimeHours}}, Overtime Hours: {{{overtimeHours}}}{{/if}}
+- Date: {{{date}}}, Status: {{{status}}}
 {{/each}}
 
 {{#if deductions.length}}
-Deductions:
+Other Deductions:
 {{#each deductions}}
 - Description: {{{description}}}, Amount: {{{amount}}}
 {{/each}}
 {{else}}
-No deductions.
+No other deductions.
 {{/if}}
 
 Calculation Rules:
-- 'Present' status: Use 'hoursWorked' if provided, otherwise assume {{{standardWorkHoursPerDay}}} hours.
-- 'Half-Day' status: Hours are half of a standard day ({{{standardWorkHoursPerDay}}} / 2).
-- 'Overtime' status: In addition to regular hours, 'overtimeHours' are paid at {{{overtimeRateMultiplier}}} times the hourly rate.
-- 'Absent' status: 0 hours.
-- Deduct the total amount from any 'Deductions' from the gross salary.
+1.  Determine the daily salary. You can assume a standard of 260 working days per year. Daily Salary = Yearly Salary / 260.
+2.  Calculate the total earned salary for the period based on the attendance records.
+    - For each 'Present' or 'Overtime' day, add one full daily salary.
+    - For each 'Half-Day', add half of the daily salary.
+    - 'Absent' days contribute 0 to the earned salary.
+3.  The sum from step 2 is the Gross Earned Salary for the period.
+4.  From the Gross Earned Salary, subtract the 'Total Payments Already Made' in this period.
+5.  From the result, subtract the total amount of any 'Other Deductions'.
+6.  The final result is the Net Salary to be paid.
 
 Task:
-1.  Calculate the final salary based on the provided data and rules.
-2.  Provide a detailed, step-by-step breakdown of the calculation in the 'calculationBreakdown' field. The breakdown should be clear, easy to follow, and explain how the total was reached.
+1.  Calculate the final net salary to be paid based on the provided data and rules.
+2.  Provide a detailed, step-by-step breakdown of the calculation in the 'calculationBreakdown' field. It should include:
+    - The calculated daily salary.
+    - A summary of days worked (present, half-day, absent).
+    - The Gross Earned Salary calculation.
+    - Subtraction of payments already made.
+    - Subtraction of other deductions.
+    - The final Net Salary.
 3.  The final numeric salary must be placed in the 'calculatedSalary' field.
 `,
 });

@@ -38,7 +38,7 @@ export const getColumns = ({ staff, onEdit, onDelete }: GetColumnsProps): Column
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'));
-      return <div className="text-right font-medium">{amount.toLocaleString('en-IN')}</div>;
+      return <div className="text-right font-medium">{amount.toLocaleString()}</div>;
     },
   },
   {

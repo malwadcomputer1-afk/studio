@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialData } from '@/lib/mock-data';
-import { Attendance, Staff } from '@/lib/types';
+import { Attendance, Staff, Payment } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -33,6 +33,7 @@ type SalaryOutput = { calculatedSalary: number; calculationBreakdown: string; };
 export function SalaryCalculator() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
   const [attendance] = useLocalStorage<Attendance[]>('attendance', initialData.attendance);
+  const [payments] = useLocalStorage<Payment[]>('payments', initialData.payments);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<SalaryOutput | null>(null);
@@ -59,21 +60,36 @@ export function SalaryCalculator() {
       return;
     }
 
+    const { from, to } = values.dateRange;
+
     const attendanceRecords = attendance.filter((a) => {
       const recordDate = new Date(a.date);
       return (
         a.staffId === values.staffId &&
-        !isBefore(recordDate, values.dateRange.from) &&
-        !isAfter(recordDate, values.dateRange.to)
+        !isBefore(recordDate, from) &&
+        !isAfter(recordDate, to)
       );
     });
+
+    const totalPaymentsMade = payments
+        .filter(p => {
+            const paymentDate = new Date(p.date);
+            return p.staffId === values.staffId &&
+                   !isBefore(paymentDate, from) &&
+                   !isAfter(paymentDate, to);
+        })
+        .reduce((sum, p) => sum + p.amount, 0);
 
     try {
       const output = await calculateSalary({
         staffName: selectedStaff.name,
-        hourlyRate: selectedStaff.hourlyRate,
+        yearlySalary: selectedStaff.yearlySalary,
+        totalPaymentsMade: totalPaymentsMade,
         attendanceRecords: attendanceRecords,
-        standardWorkHoursPerDay: 8,
+        dateRange: {
+            from: format(from, 'yyyy-MM-dd'),
+            to: format(to, 'yyyy-MM-dd')
+        }
       });
       setResult(output);
     } catch (error) {
@@ -190,7 +206,7 @@ export function SalaryCalculator() {
                <div>
                  <p className="text-sm text-muted-foreground">Total Salary</p>
                  <p className="text-3xl font-bold text-primary">
-                    {result.calculatedSalary.toLocaleString('en-IN')}
+                    {result.calculatedSalary.toLocaleString()}
                  </p>
                </div>
                 <div className="prose prose-sm max-w-none text-foreground prose-p:my-1 prose-headings:my-2 prose-headings:font-headline">

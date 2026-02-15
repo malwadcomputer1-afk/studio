@@ -119,7 +119,7 @@ export default function DashboardPage() {
                 <div>
                     <p className="text-muted-foreground">Expenses This Month</p>
                     <p className="text-2xl font-bold">
-                        {totalExpensesThisMonth.toLocaleString('en-IN')}
+                        {totalExpensesThisMonth.toLocaleString()}
                     </p>
                 </div>
             </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground">Total Payments Made</p>
                     <p className="text-2xl font-bold">
                         {(payments
-                        .reduce((sum, p) => sum + p.amount, 0)).toLocaleString('en-IN')}
+                        .reduce((sum, p) => sum + p.amount, 0)).toLocaleString()}
                     </p>
                 </div>
             </div>
