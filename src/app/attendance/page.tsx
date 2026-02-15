@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -72,31 +73,68 @@ export default function AttendancePage() {
     return names[0][0];
   }
 
+  const daysWithSomePresent = [...new Set(attendance.filter(a => a.status !== 'Absent').map(a => a.date))].map(dateStr => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d, 12); // Use noon to avoid timezone issues
+  });
+
+  const staffOnSelectedDate = date ? staff.map(s => {
+    const status = getAttendanceStatus(s.id);
+    return { ...s, status };
+  }) : [];
+  
+  const attendanceSummary: Record<string, number> = staffOnSelectedDate.reduce((acc, s) => {
+    acc[s.status] = (acc[s.status] || 0) + 1;
+    return acc;
+  }, {} as Record<AttendanceStatus, number>);
+
   return (
     <>
       <PageHeader
         title="Attendance Tracking"
-        description="View and manage daily staff attendance."
+        description="Select a date to view and manage daily staff attendance."
       />
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
+      <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="md:col-span-1 flex flex-col gap-6">
             <Card>
-                <CardContent className="p-0 sm:p-2">
+                <CardContent className="p-0 flex justify-center">
                     <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
                         className="rounded-md"
-                        disabled={(d) => d > new Date() || d < new Date("1900-01-01")}
+                        disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
+                        modifiers={{ present: daysWithSomePresent }}
+                        modifiersClassNames={{ present: 'has-attendance-dot' }}
                     />
                 </CardContent>
             </Card>
+            {date && (
+              <Card>
+                  <CardHeader>
+                      <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                      {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
+                        (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
+                            attendanceSummary[status] > 0 &&
+                            <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' || status === 'Overtime' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
+                                <span>{status}</span>
+                                <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
+                            </Badge>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
+                      )}
+                  </CardContent>
+              </Card>
+            )}
         </div>
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>
-                Attendance for {date ? format(date, 'MMMM d, yyyy') : '...'}
+                Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -122,6 +160,7 @@ export default function AttendancePage() {
                       onValueChange={(status: AttendanceStatus) =>
                         handleAttendanceChange(s.id, status)
                       }
+                      disabled={!date}
                     >
                       <SelectTrigger className="w-[140px]">
                         <SelectValue placeholder="Set status" />

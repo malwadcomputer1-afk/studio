@@ -103,4 +103,31 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .has-attendance-dot:not([aria-selected="true"]):not(.rdp-day_today) > .rdp-button {
+    font-weight: 600;
+  }
+
+  .has-attendance-dot {
+    position: relative;
+  }
+  .has-attendance-dot .rdp-button::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: hsl(var(--primary) / 0.6);
+  }
+
+  .has-attendance-dot.rdp-day_today .rdp-button::after {
+    background-color: hsl(var(--accent-foreground));
+  }
+  
+  .has-attendance-dot[aria-selected="true"] .rdp-button::after {
+     background-color: hsl(var(--primary-foreground));
+  }
 }
