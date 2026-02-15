@@ -21,7 +21,7 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string, 
     const finalY = (doc as any).lastAutoTable.finalY;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Total: ${total.toLocaleString()}`, 14, finalY + 10);
+    doc.text(`Total: ${total}`, 14, finalY + 10);
   }
 
   doc.save(`${fileName}.pdf`);
@@ -32,7 +32,7 @@ export const generateExpensesPdf = (expenses: Expense[]) => {
   const body = expenses.map((exp, index) => [
     index + 1,
     exp.service,
-    exp.amount.toLocaleString(),
+    exp.amount,
     format(new Date(exp.date), 'MMM d, yyyy'),
   ]);
   
@@ -62,7 +62,7 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
             return [
                 index + 1,
                 p.notes || '',
-                p.amount.toLocaleString(),
+                p.amount,
                 format(new Date(p.date), 'MMM d, yyyy'),
             ];
         }
@@ -70,7 +70,7 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
             index + 1,
             staffMap.get(p.staffId) || 'Unknown',
             p.notes || '',
-            p.amount.toLocaleString(),
+            p.amount,
             format(new Date(p.date), 'MMM d, yyyy'),
         ];
     });
@@ -83,25 +83,27 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
 export const generateAttendancePdf = (
   attendance: Attendance[],
   staff: Staff[],
-  month: Date,
+  _month: Date, // No longer used for titling, but kept for function signature consistency
   staffMember?: Staff
 ) => {
   const staffMap = new Map(staff.map(s => [s.id, s.name]));
-  const monthName = format(month, 'MMMM yyyy');
-
+  
   const reportTitle = staffMember
-    ? `Attendance Report for ${staffMember.name} - ${monthName}`
-    : `Monthly Attendance Report - ${monthName}`;
+    ? `Attendance Report for ${staffMember.name}`
+    : `Full Attendance Report`;
 
   const fileName = staffMember
-    ? `attendance-report-${staffMember.name.toLowerCase().replace(/ /g, '-')}-${format(month, 'yyyy-MM')}`
-    : `attendance-report-all-${format(month, 'yyyy-MM')}`;
+    ? `attendance-report-${staffMember.name.toLowerCase().replace(/ /g, '-')}-${format(new Date(), 'yyyy-MM-dd')}`
+    : `attendance-report-all-${format(new Date(), 'yyyy-MM-dd')}`;
 
   const head = staffMember
     ? [['Sr. No.', 'Date', 'Status', 'Hours Worked']]
     : [['Sr. No.', 'Date', 'Staff Member', 'Status', 'Hours Worked']];
 
-  const body = attendance.map((att, index) => {
+  // Sort by date descending
+  const sortedAttendance = [...attendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const body = sortedAttendance.map((att, index) => {
     const row: (string | number)[] = [
         index + 1,
         format(new Date(att.date), 'MMM d, yyyy'),

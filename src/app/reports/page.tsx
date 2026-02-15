@@ -8,7 +8,7 @@ import { initialData } from '@/lib/mock-data';
 import { generateExpensesPdf, generatePaymentsPdf, generateAttendancePdf } from '@/lib/pdf-generator';
 import { Expense, Payment, Staff, Attendance } from '@/lib/types';
 import { FileDown, User, CalendarDays } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { format } from 'date-fns';
 
 export default function ReportsPage() {
   const [expenses] = useLocalStorage<Expense[]>('expenses', initialData.expenses);
@@ -31,21 +31,12 @@ export default function ReportsPage() {
   
   const handleDownloadAttendance = (staffMember?: Staff) => {
     const today = new Date();
-    const currentMonthInterval = {
-      start: startOfMonth(today),
-      end: endOfMonth(today),
-    };
     
-    const monthlyAttendance = attendance.filter(att => {
-      const attDate = new Date(att.date);
-      const inMonth = isWithinInterval(attDate, currentMonthInterval);
-      if (staffMember) {
-        return inMonth && att.staffId === staffMember.id;
-      }
-      return inMonth;
-    });
+    const filteredAttendance = staffMember
+      ? attendance.filter(att => att.staffId === staffMember.id)
+      : attendance;
     
-    generateAttendancePdf(monthlyAttendance, staff, today, staffMember);
+    generateAttendancePdf(filteredAttendance, staff, today, staffMember);
   };
 
   return (
@@ -116,7 +107,7 @@ export default function ReportsPage() {
           <CardHeader>
             <CardTitle>Attendance Report</CardTitle>
             <CardDescription>
-              Download attendance reports for the current month.
+              Download attendance reports for all recorded days.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
