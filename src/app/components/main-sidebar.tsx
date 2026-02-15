@@ -39,9 +39,9 @@ export function MainSidebar({ pathname }: { pathname: string }) {
     <>
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+          <Button variant="ghost" className="h-12 w-12 p-0" asChild>
              <Link href="/">
-               <AppLogo className="w-8 h-8 text-primary" />
+               <AppLogo className="w-12 h-12 text-primary" />
              </Link>
           </Button>
           <h1 className="text-xl font-headline font-semibold">Malwad Farm</h1>
