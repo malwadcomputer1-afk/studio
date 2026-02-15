@@ -83,7 +83,7 @@ export function StaffForm({ staff, onSubmit }: StaffFormProps) {
           name="yearlySalary"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Yearly Salary (₹)</FormLabel>
+              <FormLabel>Yearly Salary</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="60000" {...field} />
               </FormControl>

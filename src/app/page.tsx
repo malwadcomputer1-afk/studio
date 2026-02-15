@@ -119,7 +119,7 @@ export default function DashboardPage() {
                 <div>
                     <p className="text-muted-foreground">Expenses This Month</p>
                     <p className="text-2xl font-bold">
-                        {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', currencyDisplay: 'symbol' }).format(totalExpensesThisMonth)}
+                        {totalExpensesThisMonth.toLocaleString('en-IN')}
                     </p>
                 </div>
             </div>
@@ -130,8 +130,8 @@ export default function DashboardPage() {
                 <div>
                     <p className="text-muted-foreground">Total Payments Made</p>
                     <p className="text-2xl font-bold">
-                        {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', currencyDisplay: 'symbol' }).format(payments
-                        .reduce((sum, p) => sum + p.amount, 0))}
+                        {(payments
+                        .reduce((sum, p) => sum + p.amount, 0)).toLocaleString('en-IN')}
                     </p>
                 </div>
             </div>

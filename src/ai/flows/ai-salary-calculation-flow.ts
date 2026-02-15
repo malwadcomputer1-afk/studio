@@ -49,15 +49,13 @@ const calculateSalaryPrompt = ai.definePrompt({
   name: 'calculateSalaryPrompt',
   input: { schema: CalculateSalaryInputSchema },
   output: { schema: CalculateSalaryOutputSchema },
-  prompt: `You are an expert payroll specialist tasked with calculating a staff member's salary.
+  prompt: `You are an expert payroll specialist. Calculate the salary for {{{staffName}}}.
 
-Calculate the total salary for {{{staffName}}} based on the following information:
-
-Staff Name: {{{staffName}}}
-Hourly Rate: {{{hourlyRate}}} per hour
-Standard Work Hours per Full Day: {{{standardWorkHoursPerDay}}} hours
-{{#if halfDayHours}}Half-Day Hours: {{{halfDayHours}}} hours{{/if}}
-Overtime Rate Multiplier: {{{overtimeRateMultiplier}}}
+Base Information:
+- Staff Name: {{{staffName}}}
+- Hourly Rate: {{{hourlyRate}}}
+- Standard Work Hours per Day: {{{standardWorkHoursPerDay}}}
+- Overtime Rate Multiplier: {{{overtimeRateMultiplier}}}
 
 Attendance Records:
 {{#each attendanceRecords}}
@@ -73,14 +71,17 @@ Deductions:
 No deductions.
 {{/if}}
 
-Instructions:
-1. For 'Present' days, assume {{{standardWorkHoursPerDay}}} hours worked unless 'hoursWorked' is specified.
-2. For 'Half-Day' status, assume {{{halfDayHours}} or ({{{standardWorkHoursPerDay}}} / 2)}} hours worked.
-3. For 'Overtime' status, consider 'overtimeHours' at the 'overtimeRateMultiplier' times the 'hourlyRate'. Also account for base hours worked if specified, or assume {{{standardWorkHoursPerDay}}} hours otherwise.
-4. 'Absent' days contribute 0 hours.
-5. Sum up all earnings from regular and overtime hours.
-6. Subtract any specified deductions.
-7. Provide a detailed, step-by-step breakdown of your calculation, showing how you arrived at the final salary. Highlight total regular hours, total overtime hours, total earnings, and total deductions.
+Calculation Rules:
+- 'Present' status: Use 'hoursWorked' if provided, otherwise assume {{{standardWorkHoursPerDay}}} hours.
+- 'Half-Day' status: Hours are half of a standard day ({{{standardWorkHoursPerDay}}} / 2).
+- 'Overtime' status: In addition to regular hours, 'overtimeHours' are paid at {{{overtimeRateMultiplier}}} times the hourly rate.
+- 'Absent' status: 0 hours.
+- Deduct the total amount from any 'Deductions' from the gross salary.
+
+Task:
+1.  Calculate the final salary based on the provided data and rules.
+2.  Provide a detailed, step-by-step breakdown of the calculation in the 'calculationBreakdown' field. The breakdown should be clear, easy to follow, and explain how the total was reached.
+3.  The final numeric salary must be placed in the 'calculatedSalary' field.
 `,
 });
 
