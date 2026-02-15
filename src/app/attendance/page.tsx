@@ -13,10 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { useState, useMemo } from 'react';
+import { Calendar } from '@/components/ui/calendar';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -83,17 +83,44 @@ export default function AttendancePage() {
     return acc;
   }, {} as Record<AttendanceStatus, number>);
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value) {
-      // The input value is a string like 'YYYY-MM-DD'.
-      // To avoid timezone issues where `new Date('...')` can be off by a day,
-      // we construct the date from its parts, which creates it in the local timezone.
-      const [year, month, day] = e.target.value.split('-').map(Number);
-      setDate(new Date(year, month - 1, day));
-    } else {
-      setDate(undefined);
+  const attendanceByDate = useMemo(() => {
+    const groups: Record<string, AttendanceStatus[]> = {};
+    attendance.forEach(att => {
+      if (!groups[att.date]) {
+        groups[att.date] = [];
+      }
+      groups[att.date].push(att.status);
+    });
+    return groups;
+  }, [attendance]);
+
+  const modifiers = useMemo(() => {
+    const present: Date[] = [];
+    const absent: Date[] = [];
+    const halfDay: Date[] = [];
+
+    for (const dateStr in attendanceByDate) {
+      const statuses = attendanceByDate[dateStr];
+      const dateParts = dateStr.split('-').map(Number);
+      const day = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+
+      if (statuses.includes('Absent')) {
+        absent.push(day);
+      } else if (statuses.includes('Half-Day')) {
+        halfDay.push(day);
+      } else if (statuses.length > 0 && statuses.every(s => s === 'Present')) {
+        present.push(day);
+      }
     }
+    return { present, absent, halfDay };
+  }, [attendanceByDate]);
+
+  const modifierClasses = {
+    present: 'day-present',
+    absent: 'day-absent',
+    halfDay: 'day-half-day',
   };
+
 
   return (
     <>
@@ -105,14 +132,31 @@ export default function AttendancePage() {
           <div className="md:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
-                    <CardTitle>Select Date</CardTitle>
+                    <CardTitle>Attendance Calendar</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <Input
-                        type="date"
-                        value={date ? format(date, 'yyyy-MM-dd') : ''}
-                        onChange={handleDateChange}
+                <CardContent className="flex flex-col items-center">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        className="rounded-md border p-0"
+                        modifiers={modifiers}
+                        modifiersClassNames={modifierClasses}
                     />
+                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-1))]"></div>
+                            <span>Present</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-[hsl(48,95%,57%)]"></div>
+                            <span>Half-Day</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-destructive"></div>
+                            <span>Absent</span>
+                        </div>
+                    </div>
                 </CardContent>
               </Card>
 
@@ -161,22 +205,24 @@ export default function AttendancePage() {
                           </div>
                       </div>
 
-                      <Select
-                      value={getAttendanceStatus(s.id)}
-                      onValueChange={(status: AttendanceStatus) =>
-                          handleAttendanceChange(s.id, status)
-                      }
-                      disabled={!date}
-                      >
-                      <SelectTrigger className="w-full md:w-[140px] mt-2 md:mt-0">
-                          <SelectValue placeholder="Set status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectItem value="Present">Present</SelectItem>
-                          <SelectItem value="Absent">Absent</SelectItem>
-                          <SelectItem value="Half-Day">Half-Day</SelectItem>
-                      </SelectContent>
-                      </Select>
+                      <div className="w-full md:w-auto">
+                        <Select
+                        value={getAttendanceStatus(s.id)}
+                        onValueChange={(status: AttendanceStatus) =>
+                            handleAttendanceChange(s.id, status)
+                        }
+                        disabled={!date}
+                        >
+                        <SelectTrigger className="w-full md:w-[140px] mt-2 md:mt-0">
+                            <SelectValue placeholder="Set status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Present">Present</SelectItem>
+                            <SelectItem value="Absent">Absent</SelectItem>
+                            <SelectItem value="Half-Day">Half-Day</SelectItem>
+                        </SelectContent>
+                        </Select>
+                      </div>
                   </div>
                   ))}
               </div>

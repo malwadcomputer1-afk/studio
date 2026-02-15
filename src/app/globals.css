@@ -104,30 +104,45 @@
     @apply bg-background text-foreground;
   }
 
-  .has-attendance-dot:not([aria-selected="true"]):not(.rdp-day_today) > .rdp-button {
-    font-weight: 600;
-  }
-
-  .has-attendance-dot {
+  .day-present, .day-absent, .day-half-day {
     position: relative;
   }
-  .has-attendance-dot .rdp-button::after {
+
+  .day-present .rdp-button::after,
+  .day-absent .rdp-button::after,
+  .day-half-day .rdp-button::after {
     content: '';
     position: absolute;
     bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: hsl(var(--primary) / 0.6);
-  }
-
-  .has-attendance-dot.rdp-day_today .rdp-button::after {
-    background-color: hsl(var(--accent-foreground));
   }
   
-  .has-attendance-dot[aria-selected="true"] .rdp-button::after {
+  .day-present .rdp-button::after {
+    background-color: hsl(var(--chart-1));
+  }
+  
+  .day-absent .rdp-button::after {
+    background-color: hsl(var(--destructive));
+  }
+
+  .day-half-day .rdp-button::after {
+    background-color: hsl(48, 95%, 57%); /* yellow */
+  }
+
+  /* Adjust for selected and today */
+  [aria-selected="true"].day-present .rdp-button::after,
+  [aria-selected="true"].day-absent .rdp-button::after,
+  [aria-selected="true"].day-half-day .rdp-button::after {
      background-color: hsl(var(--primary-foreground));
+  }
+  
+  .rdp-day_today.day-present .rdp-button::after,
+  .rdp-day_today.day-absent .rdp-button::after,
+  .rdp-day_today.day-half-day .rdp-button::after {
+    background-color: hsl(var(--accent-foreground));
   }
 }
