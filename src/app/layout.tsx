@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppClientLayout } from '@/app/components/app-client-layout';
 
 export const metadata: Metadata = {
-  title: 'FarmFlow',
+  title: 'Malwad Farm',
   description: 'A comprehensive farm management app.',
 };
 

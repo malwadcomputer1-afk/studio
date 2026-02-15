@@ -44,7 +44,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
                <Leaf className="w-6 h-6 text-primary" />
              </Link>
           </Button>
-          <h1 className="text-xl font-headline font-semibold">FarmFlow</h1>
+          <h1 className="text-xl font-headline font-semibold">Malwad Farm</h1>
           <div className="grow" />
           <SidebarTrigger />
         </div>
@@ -70,7 +70,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
       <SidebarFooter>
         <div className="flex items-center gap-2 p-2 text-xs text-sidebar-foreground/70">
             <Leaf className="w-4 h-4" />
-            <span>FarmFlow v1.0</span>
+            <span>Malwad Farm v1.0</span>
         </div>
       </SidebarFooter>
     </>

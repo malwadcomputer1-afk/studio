@@ -50,7 +50,7 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title="Welcome to FarmFlow"
+        title="Welcome to Malwad Farm"
         description={`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
       />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
