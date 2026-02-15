@@ -46,16 +46,19 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="relative flex flex-col items-center mb-6 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">
-          Malwad Farm
-        </h1>
-        <p className="mt-1 text-muted-foreground">
+      <div className="mb-6">
+        <div className="flex items-center justify-between md:justify-center">
+          <div className="md:hidden">
+            <SidebarTrigger />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">
+            Malwad Farm
+          </h1>
+          <div className="w-7 h-7 md:hidden" />
+        </div>
+        <p className="mt-1 text-center text-muted-foreground">
           {`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
         </p>
-        <div className="absolute top-0 right-0 md:hidden">
-          <SidebarTrigger />
-        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
