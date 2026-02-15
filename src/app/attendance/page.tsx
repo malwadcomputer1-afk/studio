@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { Calendar } from '@/components/ui/calendar';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -22,7 +24,7 @@ export default function AttendancePage() {
     'attendance',
     initialData.attendance
   );
-  const date = new Date();
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const handleAttendanceChange = (
     staffId: string,
@@ -85,10 +87,16 @@ export default function AttendancePage() {
     <>
       <PageHeader
         title="Attendance Tracking"
-        description="View and manage daily staff attendance for today."
+        description="Select a date to view and manage daily staff attendance."
       />
       <div className="grid md:grid-cols-3 gap-6 items-start">
-          <div className="md:col-span-1">
+          <div className="md:col-span-1 space-y-6">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border"
+              />
               {date && (
               <Card>
                   <CardHeader>
