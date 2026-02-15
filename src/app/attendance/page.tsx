@@ -74,13 +74,13 @@ export default function AttendancePage() {
     setPendingChanges(prev => ({...prev, [staffId]: status}));
   };
 
-  const getAttendanceStatus = (staffId: string): AttendanceStatus => {
-    if (!date) return 'Absent';
+  const getAttendanceStatus = (staffId: string): AttendanceStatus | undefined => {
+    if (!date) return undefined;
     const formattedDate = format(date, 'yyyy-MM-dd');
     const record = attendance.find(
       (a) => a.staffId === staffId && a.date === formattedDate
     );
-    return record?.status || 'Absent';
+    return record?.status;
   };
   
   const getInitials = (name: string) => {
@@ -89,7 +89,7 @@ export default function AttendancePage() {
 
   const staffOnSelectedDate = date ? staff.map(s => {
     const status = getAttendanceStatus(s.id);
-    return { ...s, status };
+    return { ...s, status: status || 'Absent' };
   }) : [];
   
   const attendanceSummary: Record<string, number> = staffOnSelectedDate.reduce((acc, s) => {
@@ -177,7 +177,7 @@ export default function AttendancePage() {
                               </SelectContent>
                             </Select>
                             {hasPendingChange && date && (
-                              <Button size="sm" onClick={() => handleAttendanceSave(s.id, selectedStatus)}>Save</Button>
+                              <Button size="sm" onClick={() => handleAttendanceSave(s.id, selectedStatus!)}>Save</Button>
                             )}
                           </div>
                       </div>
