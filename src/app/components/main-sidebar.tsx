@@ -17,8 +17,6 @@ import {
   Calculator,
   CreditCard,
   ClipboardList,
-  CalendarDays,
-  Sprout,
   Landmark,
   BarChart,
   Leaf,
@@ -32,8 +30,6 @@ const menuItems = [
     { href: "/salary", label: "Salary", icon: Calculator },
     { href: "/payments", label: "Payments", icon: CreditCard },
     { href: "/activities", label: "Activities", icon: ClipboardList },
-    { href: "/calendar", label: "Calendar", icon: CalendarDays },
-    { href: "/crops-and-fields", label: "Crops & Fields", icon: Sprout },
     { href: "/expenses", label: "Expenses", icon: Landmark },
     { href: "/reports", label: "Reports", icon: BarChart },
 ];
