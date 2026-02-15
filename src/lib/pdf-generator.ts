@@ -34,13 +34,37 @@ export const generateExpensesPdf = (expenses: Expense[]) => {
 export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
     const staffMap = new Map(staff.map(s => [s.id, s.name]));
     
-    const head = [['Date', 'Staff Member', 'Amount', 'Notes']];
-    const body = payments.map(p => [
-      format(new Date(p.date), 'MMM d, yyyy'),
-      staffMap.get(p.staffId) || 'Unknown',
-      p.amount.toLocaleString(),
-      p.notes || '',
-    ]);
+    // A report is for a single staff member if only one staff member is provided
+    // and all payments belong to them.
+    const isSingleStaffReport = staff.length === 1 && payments.every(p => p.staffId === staff[0].id);
 
-    generatePdf('Salary Payments Report', head, body, `payments-report-${format(new Date(), 'yyyy-MM-dd')}`);
+    const reportTitle = isSingleStaffReport
+        ? `Payment Report for ${staff[0].name}` 
+        : 'Salary Payments Report';
+    
+    const fileName = isSingleStaffReport
+      ? `payment-report-${staff[0].name.toLowerCase().replace(/ /g, '-')}-${format(new Date(), 'yyyy-MM-dd')}`
+      : `payments-report-all-${format(new Date(), 'yyyy-MM-dd')}`;
+
+    const head = isSingleStaffReport
+      ? [['Date', 'Amount', 'Notes']]
+      : [['Date', 'Staff Member', 'Amount', 'Notes']];
+      
+    const body = payments.map(p => {
+        if (isSingleStaffReport) {
+            return [
+                format(new Date(p.date), 'MMM d, yyyy'),
+                p.amount.toLocaleString(),
+                p.notes || '',
+            ];
+        }
+        return [
+            format(new Date(p.date), 'MMM d, yyyy'),
+            staffMap.get(p.staffId) || 'Unknown',
+            p.amount.toLocaleString(),
+            p.notes || '',
+        ];
+    });
+
+    generatePdf(reportTitle, head, body, fileName);
 };
