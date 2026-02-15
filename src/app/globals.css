@@ -103,46 +103,4 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  .day-present, .day-absent, .day-half-day {
-    position: relative;
-  }
-
-  .day-present .rdp-button::after,
-  .day-absent .rdp-button::after,
-  .day-half-day .rdp-button::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-  
-  .day-present .rdp-button::after {
-    background-color: hsl(var(--chart-1));
-  }
-  
-  .day-absent .rdp-button::after {
-    background-color: hsl(var(--destructive));
-  }
-
-  .day-half-day .rdp-button::after {
-    background-color: hsl(48, 95%, 57%); /* yellow */
-  }
-
-  /* Adjust for selected and today */
-  [aria-selected="true"].day-present .rdp-button::after,
-  [aria-selected="true"].day-absent .rdp-button::after,
-  [aria-selected="true"].day-half-day .rdp-button::after {
-     background-color: hsl(var(--primary-foreground));
-  }
-  
-  .rdp-day_today.day-present .rdp-button::after,
-  .rdp-day_today.day-absent .rdp-button::after,
-  .rdp-day_today.day-half-day .rdp-button::after {
-    background-color: hsl(var(--accent-foreground));
-  }
 }

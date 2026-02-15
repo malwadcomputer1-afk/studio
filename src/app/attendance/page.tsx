@@ -15,8 +15,8 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { useState, useMemo } from 'react';
-import { Calendar } from '@/components/ui/calendar';
+import { useState, type ChangeEvent } from 'react';
+import { Input } from '@/components/ui/input';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -83,44 +83,15 @@ export default function AttendancePage() {
     return acc;
   }, {} as Record<AttendanceStatus, number>);
 
-  const attendanceByDate = useMemo(() => {
-    const groups: Record<string, AttendanceStatus[]> = {};
-    attendance.forEach(att => {
-      if (!groups[att.date]) {
-        groups[att.date] = [];
-      }
-      groups[att.date].push(att.status);
-    });
-    return groups;
-  }, [attendance]);
-
-  const modifiers = useMemo(() => {
-    const present: Date[] = [];
-    const absent: Date[] = [];
-    const halfDay: Date[] = [];
-
-    for (const dateStr in attendanceByDate) {
-      const statuses = attendanceByDate[dateStr];
-      const dateParts = dateStr.split('-').map(Number);
-      const day = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-
-      if (statuses.includes('Absent')) {
-        absent.push(day);
-      } else if (statuses.includes('Half-Day')) {
-        halfDay.push(day);
-      } else if (statuses.length > 0 && statuses.every(s => s === 'Present')) {
-        present.push(day);
-      }
+  const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value) {
+        // Adding 'T00:00:00' ensures the date is parsed in the user's local timezone
+        const newDate = new Date(event.target.value + 'T00:00:00');
+        setDate(newDate);
+    } else {
+        setDate(undefined);
     }
-    return { present, absent, halfDay };
-  }, [attendanceByDate]);
-
-  const modifierClasses = {
-    present: 'day-present',
-    absent: 'day-absent',
-    halfDay: 'day-half-day',
   };
-
 
   return (
     <>
@@ -132,31 +103,14 @@ export default function AttendancePage() {
           <div className="md:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
-                    <CardTitle>Attendance Calendar</CardTitle>
+                    <CardTitle>Select Date</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col">
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        className="rounded-md border p-0"
-                        modifiers={modifiers}
-                        modifiersClassNames={modifierClasses}
+                <CardContent>
+                    <Input
+                        type="date"
+                        value={date ? format(date, 'yyyy-MM-dd') : ''}
+                        onChange={handleDateChange}
                     />
-                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-1))]"></div>
-                            <span>Present</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-[hsl(48,95%,57%)]"></div>
-                            <span>Half-Day</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-destructive"></div>
-                            <span>Absent</span>
-                        </div>
-                    </div>
                 </CardContent>
               </Card>
 
