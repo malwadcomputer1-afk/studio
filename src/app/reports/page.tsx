@@ -4,17 +4,20 @@ import { PageHeader } from '@/app/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import useLocalStorage from '@/hooks/use-local-storage';
-import { initialData } from '@/lib/mock-data';
 import { generateExpensesPdf, generatePaymentsPdf, generateAttendancePdf } from '@/lib/pdf-generator';
 import { Expense, Payment, Staff, Attendance } from '@/lib/types';
-import { FileDown, User, CalendarDays } from 'lucide-react';
+import { FileDown, User, CalendarDays, Mail } from 'lucide-react';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export default function ReportsPage() {
-  const [expenses] = useLocalStorage<Expense[]>('expenses', initialData.expenses);
-  const [payments] = useLocalStorage<Payment[]>('payments', initialData.payments);
-  const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
-  const [attendance] = useLocalStorage<Attendance[]>('attendance', initialData.attendance);
+  const [expenses] = useLocalStorage<Expense[]>('expenses', []);
+  const [payments] = useLocalStorage<Payment[]>('payments', []);
+  const [staff] = useLocalStorage<Staff[]>('staff', []);
+  const [attendance] = useLocalStorage<Attendance[]>('attendance', []);
+  const [isEmailScheduled, setIsEmailScheduled] = useState(false);
 
   const handleDownloadExpenses = () => {
     generateExpensesPdf(expenses);
@@ -140,6 +143,35 @@ export default function ReportsPage() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Automated Email Reports</CardTitle>
+            <CardDescription>
+              Enable to automatically send all reports to your email at the end of each month.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="email-schedule"
+                checked={isEmailScheduled}
+                onCheckedChange={setIsEmailScheduled}
+              />
+              <Label htmlFor="email-schedule">Enable Monthly Reports</Label>
+            </div>
+            {isEmailScheduled && (
+              <div className="flex items-center text-sm text-muted-foreground p-3 bg-muted rounded-md">
+                <Mail className="mr-2 h-4 w-4 flex-shrink-0" />
+                <div className="flex flex-col">
+                  <span>Reports will be sent to:</span>
+                  <span className="font-medium text-foreground">malwadcomputer1@gmail.com</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
       </div>
     </>
   );
