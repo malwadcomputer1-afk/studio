@@ -8,6 +8,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,8 @@ const menuItems = [
 ];
 
 export function MainSidebar({ pathname }: { pathname: string }) {
+  const { setOpenMobile } = useSidebar();
+  
   return (
     <>
       <SidebarHeader>
@@ -57,6 +60,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
                 asChild
                 isActive={pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/")}
                 tooltip={{ children: item.label }}
+                onClick={() => setOpenMobile(false)}
               >
                 <Link href={item.href}>
                   <item.icon />
