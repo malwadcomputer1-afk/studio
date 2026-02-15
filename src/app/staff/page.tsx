@@ -52,6 +52,7 @@ export default function StaffPage() {
       <DataTable 
         columns={columns({ onEdit: updateStaffMember, onDelete: deleteStaffMember })} 
         data={staff} 
+        filterColumn={{id: 'name', placeholder: 'Filter by name...'}}
       />
     </>
   );
