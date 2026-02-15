@@ -99,43 +99,23 @@ export default function AttendancePage() {
         title="Attendance Tracking"
         description="Select a date to view and manage daily staff attendance."
       />
-      <div className="grid md:grid-cols-3 gap-6 items-start">
-          <div className="md:col-span-1 space-y-6">
-              <Card>
-                <CardHeader>
-                    <CardTitle>Select Date</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Input
-                        type="date"
-                        value={date ? format(date, 'yyyy-MM-dd') : ''}
-                        onChange={handleDateChange}
-                    />
-                </CardContent>
-              </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div className="md:col-span-1">
+          <Card>
+            <CardHeader>
+                <CardTitle>Select Date</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Input
+                    type="date"
+                    value={date ? format(date, 'yyyy-MM-dd') : ''}
+                    onChange={handleDateChange}
+                />
+            </CardContent>
+          </Card>
+        </div>
 
-              {date && (
-              <Card>
-                  <CardHeader>
-                      <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-wrap gap-2">
-                      {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
-                          (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
-                              attendanceSummary[status] > 0 &&
-                              <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
-                                  <span>{status}</span>
-                                  <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
-                              </Badge>
-                          ))
-                      ) : (
-                          <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
-                      )}
-                  </CardContent>
-              </Card>
-              )}
-          </div>
-          <div className="md:col-span-2">
+        <div className="md:col-span-2 md:row-start-1 md:row-span-2">
           <Card>
               <CardHeader>
               <CardTitle className="text-center">
@@ -182,7 +162,30 @@ export default function AttendancePage() {
               </div>
               </CardContent>
           </Card>
-          </div>
+        </div>
+
+        <div className="md:col-span-1">
+          {date && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                    {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
+                        (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
+                            attendanceSummary[status] > 0 &&
+                            <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
+                                <span>{status}</span>
+                                <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
+                            </Badge>
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
+                    )}
+                </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </>
   );
