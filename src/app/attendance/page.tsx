@@ -141,7 +141,7 @@ export default function AttendancePage() {
           <Card>
               <CardHeader>
               <CardTitle>
-                  Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
+                  Staff
               </CardTitle>
               </CardHeader>
               <CardContent>
@@ -168,7 +168,7 @@ export default function AttendancePage() {
                       }
                       disabled={!date}
                       >
-                      <SelectTrigger className="w-full md:w-[140px]">
+                      <SelectTrigger className="w-full md:w-[140px] mt-2 md:mt-0">
                           <SelectValue placeholder="Set status" />
                       </SelectTrigger>
                       <SelectContent>
