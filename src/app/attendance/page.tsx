@@ -134,7 +134,7 @@ export default function AttendancePage() {
                 <CardHeader>
                     <CardTitle>Attendance Calendar</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center">
+                <CardContent className="flex flex-col">
                     <Calendar
                         mode="single"
                         selected={date}
@@ -205,7 +205,7 @@ export default function AttendancePage() {
                           </div>
                       </div>
 
-                      <div className="w-full md:w-auto">
+                      <div className="w-full md:w-auto mt-2 md:mt-0">
                         <Select
                         value={getAttendanceStatus(s.id)}
                         onValueChange={(status: AttendanceStatus) =>
@@ -213,7 +213,7 @@ export default function AttendancePage() {
                         }
                         disabled={!date}
                         >
-                        <SelectTrigger className="w-full md:w-[140px] mt-2 md:mt-0">
+                        <SelectTrigger className="w-full md:w-[140px]">
                             <SelectValue placeholder="Set status" />
                         </SelectTrigger>
                         <SelectContent>
