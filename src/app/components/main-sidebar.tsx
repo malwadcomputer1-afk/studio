@@ -19,9 +19,9 @@ import {
   ClipboardList,
   Landmark,
   BarChart,
-  Leaf,
 } from "lucide-react";
 import Link from "next/link";
+import { AppLogo } from "./app-logo";
 
 const menuItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -41,7 +41,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
         <div className="flex items-center gap-2">
           <Button variant="ghost" className="h-8 w-8 p-0" asChild>
              <Link href="/">
-               <Leaf className="w-6 h-6 text-primary" />
+               <AppLogo className="w-8 h-8 text-primary" />
              </Link>
           </Button>
           <h1 className="text-xl font-headline font-semibold">Malwad Farm</h1>
@@ -69,7 +69,7 @@ export function MainSidebar({ pathname }: { pathname: string }) {
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center gap-2 p-2 text-xs text-sidebar-foreground/70">
-            <Leaf className="w-4 h-4" />
+            <AppLogo className="w-4 h-4" />
             <span>Malwad Farm v1.0</span>
         </div>
       </SidebarFooter>
