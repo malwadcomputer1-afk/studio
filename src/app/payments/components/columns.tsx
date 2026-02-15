@@ -12,16 +12,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
 
 type GetColumnsProps = {
   staff: Staff[];
-  onUpdateStatus: (paymentId: string, status: 'Paid' | 'Pending') => void;
   onEdit: (payment: Payment) => void;
   onDelete: (paymentId: string) => void;
 };
 
-export const getColumns = ({ staff, onUpdateStatus, onEdit, onDelete }: GetColumnsProps): ColumnDef<Payment>[] => [
+export const getColumns = ({ staff, onEdit, onDelete }: GetColumnsProps): ColumnDef<Payment>[] => [
   {
     accessorKey: 'staffId',
     header: 'Staff Member',
@@ -40,24 +38,13 @@ export const getColumns = ({ staff, onUpdateStatus, onEdit, onDelete }: GetColum
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'INR',
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;
     },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        return <Badge variant={status === 'Paid' ? 'default' : 'destructive'} className={status === 'Paid' ? 'bg-green-600' : ''}>{status}</Badge>
-    },
-    filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
-    }
   },
   {
     id: 'actions',
@@ -78,17 +65,6 @@ export const getColumns = ({ staff, onUpdateStatus, onEdit, onDelete }: GetColum
                 <DropdownMenuItem onClick={() => onEdit(payment)}>
                     Edit
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {payment.status === 'Pending' && (
-                    <DropdownMenuItem onClick={() => onUpdateStatus(payment.id, 'Paid')}>
-                        Mark as Paid
-                    </DropdownMenuItem>
-                )}
-                 {payment.status === 'Paid' && (
-                    <DropdownMenuItem onClick={() => onUpdateStatus(payment.id, 'Pending')}>
-                        Mark as Pending
-                    </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                 className="text-destructive"

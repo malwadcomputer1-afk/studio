@@ -21,7 +21,6 @@ const formSchema = z.object({
   staffId: z.string().min(1, { message: 'Please select a staff member.' }),
   amount: z.coerce.number().positive('Amount must be a positive number.'),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
-  status: z.enum(['Paid', 'Pending']),
   notes: z.string().optional(),
 });
 
@@ -44,7 +43,6 @@ export function PaymentForm({ payment, staff, onSubmit, onCancel }: PaymentFormP
       staffId: '',
       amount: 0,
       date: format(new Date(), 'yyyy-MM-dd'),
-      status: 'Pending',
       notes: '',
     },
   });
@@ -85,7 +83,7 @@ export function PaymentForm({ payment, staff, onSubmit, onCancel }: PaymentFormP
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount ($)</FormLabel>
+              <FormLabel>Amount (₹)</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" placeholder="5000.00" {...field} />
               </FormControl>
@@ -102,27 +100,6 @@ export function PaymentForm({ payment, staff, onSubmit, onCancel }: PaymentFormP
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-         <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Paid">Paid</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

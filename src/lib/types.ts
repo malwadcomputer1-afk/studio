@@ -42,7 +42,6 @@ export interface Payment {
   staffId: string;
   amount: number;
   date: string; // YYYY-MM-DD
-  status: 'Paid' | 'Pending';
   notes?: string;
 }
 

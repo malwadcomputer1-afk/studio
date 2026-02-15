@@ -38,7 +38,6 @@ export default function DashboardPage() {
   const presentToday = todayAttendance.filter(
     (a) => a.status === 'Present' || a.status === 'Overtime'
   ).length;
-  const pendingPayments = payments.filter((p) => p.status === 'Pending').length;
 
   const totalExpensesThisMonth = expenses
     .filter(
@@ -67,10 +66,10 @@ export default function DashboardPage() {
           description="Staff present today"
         />
         <StatCard
-          title="Pending Payments"
-          value={pendingPayments.toString()}
+          title="Total Payments"
+          value={payments.length.toString()}
           icon={DollarSign}
-          description="Salary payments awaiting processing"
+          description="Salary payments recorded"
         />
         <StatCard
           title="Upcoming Activities"
@@ -120,7 +119,7 @@ export default function DashboardPage() {
                 <div>
                     <p className="text-muted-foreground">Expenses This Month</p>
                     <p className="text-2xl font-bold">
-                        ${totalExpensesThisMonth.toLocaleString()}
+                        {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(totalExpensesThisMonth)}
                     </p>
                 </div>
             </div>
@@ -129,13 +128,10 @@ export default function DashboardPage() {
                     <TrendingUp className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <p className="text-muted-foreground">Pending Payments Total</p>
+                    <p className="text-muted-foreground">Total Payments Made</p>
                     <p className="text-2xl font-bold">
-                        $
-                        {payments
-                        .filter((p) => p.status === 'Pending')
-                        .reduce((sum, p) => sum + p.amount, 0)
-                        .toLocaleString()}
+                        {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(payments
+                        .reduce((sum, p) => sum + p.amount, 0))}
                     </p>
                 </div>
             </div>

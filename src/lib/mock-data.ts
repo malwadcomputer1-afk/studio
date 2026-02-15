@@ -94,7 +94,6 @@ export const initialData: FarmData = {
       staffId: '1',
       amount: 5000,
       date: format(subDays(today, 15), 'yyyy-MM-dd'),
-      status: 'Paid',
       notes: 'Monthly salary for previous month.',
     },
     {
@@ -102,7 +101,6 @@ export const initialData: FarmData = {
       staffId: '2',
       amount: 3333,
       date: format(subDays(today, 15), 'yyyy-MM-dd'),
-      status: 'Paid',
       notes: 'Monthly salary for previous month.',
     },
     {
@@ -110,7 +108,6 @@ export const initialData: FarmData = {
         staffId: '3',
         amount: 4000,
         date: format(subDays(today, 0), 'yyyy-MM-dd'),
-        status: 'Pending',
         notes: 'Current month salary.',
       },
   ],

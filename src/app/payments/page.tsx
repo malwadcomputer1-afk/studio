@@ -5,13 +5,6 @@ import { initialData } from '@/lib/mock-data';
 import { Payment, Staff } from '@/lib/types';
 import { getColumns } from './components/columns';
 import { DataTable } from '@/app/staff/components/data-table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -21,15 +14,8 @@ import { PaymentForm } from './components/payment-form';
 export default function PaymentsPage() {
   const [payments, setPayments] = useLocalStorage<Payment[]>('payments', initialData.payments);
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'Paid' | 'Pending'>('all');
   const [open, setOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | undefined>(undefined);
-
-  const updatePaymentStatus = (paymentId: string, status: 'Paid' | 'Pending') => {
-    setPayments(
-      payments.map((p) => (p.id === paymentId ? { ...p, status } : p))
-    );
-  };
 
   const handleEdit = (payment: Payment) => {
     setEditingPayment(payment);
@@ -40,9 +26,7 @@ export default function PaymentsPage() {
     setPayments(payments.filter((p) => p.id !== paymentId));
   };
   
-  const columns = getColumns({ staff, onUpdateStatus: updatePaymentStatus, onEdit: handleEdit, onDelete: handleDelete });
-  
-  const filteredPayments = payments.filter(p => statusFilter === 'all' || p.status === statusFilter);
+  const columns = getColumns({ staff, onEdit: handleEdit, onDelete: handleDelete });
 
   const closeDialog = () => {
     setOpen(false);
@@ -65,16 +49,6 @@ export default function PaymentsPage() {
         description="Record and view salary payments."
       >
         <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={(value: 'all' | 'Paid' | 'Pending') => setStatusFilter(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Paid">Paid</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-            </SelectContent>
-          </Select>
           <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
             <DialogTrigger asChild>
               <Button onClick={() => { setEditingPayment(undefined); setOpen(true); }}>
@@ -99,7 +73,7 @@ export default function PaymentsPage() {
       
       <DataTable 
         columns={columns} 
-        data={filteredPayments} 
+        data={payments} 
       />
     </>
   );
