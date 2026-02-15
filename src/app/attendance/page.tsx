@@ -5,9 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialData } from '@/lib/mock-data';
 import { Attendance, Staff, AttendanceStatus } from '@/lib/types';
-import { useState } from 'react';
 import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
@@ -24,7 +22,7 @@ export default function AttendancePage() {
     'attendance',
     initialData.attendance
   );
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const date = new Date();
 
   const handleAttendanceChange = (
     staffId: string,
@@ -73,11 +71,6 @@ export default function AttendancePage() {
     return names[0][0];
   }
 
-  const daysWithSomePresent = [...new Set(attendance.filter(a => a.status !== 'Absent').map(a => a.date))].map(dateStr => {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return new Date(y, m - 1, d, 12); // Use noon to avoid timezone issues
-  });
-
   const staffOnSelectedDate = date ? staff.map(s => {
     const status = getAttendanceStatus(s.id);
     return { ...s, status };
@@ -92,96 +85,78 @@ export default function AttendancePage() {
     <>
       <PageHeader
         title="Attendance Tracking"
-        description="Select a date to view and manage daily staff attendance."
+        description="View and manage daily staff attendance for today."
       />
-      <div className="flex flex-col gap-6">
-        <Card>
-            <CardContent className="p-0 flex justify-center">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
-                    modifiers={{ 
-                        present: daysWithSomePresent
-                    }}
-                    modifiersClassNames={{ 
-                        present: 'has-attendance-dot'
-                    }}
-                />
-            </CardContent>
-        </Card>
-        <div className="grid md:grid-cols-3 gap-6 items-start">
-            <div className="md:col-span-1">
-                {date && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-wrap gap-2">
-                        {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
-                            (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
-                                attendanceSummary[status] > 0 &&
-                                <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
-                                    <span>{status}</span>
-                                    <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
-                                </Badge>
-                            ))
-                        ) : (
-                            <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
-                        )}
-                    </CardContent>
-                </Card>
-                )}
-            </div>
-            <div className="md:col-span-2">
-            <Card>
-                <CardHeader>
-                <CardTitle>
-                    Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
-                </CardTitle>
-                </CardHeader>
-                <CardContent>
-                <div className="space-y-4">
-                    {staff.map((s) => (
-                    <div
-                        key={s.id}
-                        className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
-                    >
-                        <div className="flex items-center gap-4">
-                            <Avatar>
-                                <AvatarImage src={`https://i.pravatar.cc/40?u=${s.id}`} />
-                                <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold">{s.name}</p>
-                                <p className="text-sm text-muted-foreground">{s.role}</p>
-                            </div>
-                        </div>
+      <div className="grid md:grid-cols-3 gap-6 items-start">
+          <div className="md:col-span-1">
+              {date && (
+              <Card>
+                  <CardHeader>
+                      <CardTitle className="text-xl">Summary for {format(date, 'MMMM d')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                      {(Object.keys(attendanceSummary) as AttendanceStatus[]).filter(status => attendanceSummary[status] > 0).length > 0 ? (
+                          (Object.keys(attendanceSummary) as AttendanceStatus[]).map(status => (
+                              attendanceSummary[status] > 0 &&
+                              <Badge key={status} variant={status === 'Absent' ? 'destructive' : status === 'Present' ? 'default' : 'secondary'} className="flex items-center gap-2 text-sm">
+                                  <span>{status}</span>
+                                  <span className="h-5 w-5 flex items-center justify-center rounded-full bg-background/20 text-xs font-bold">{attendanceSummary[status]}</span>
+                              </Badge>
+                          ))
+                      ) : (
+                          <p className="text-muted-foreground text-sm">No attendance recorded for this day.</p>
+                      )}
+                  </CardContent>
+              </Card>
+              )}
+          </div>
+          <div className="md:col-span-2">
+          <Card>
+              <CardHeader>
+              <CardTitle>
+                  Staff for {date ? format(date, 'MMMM d, yyyy') : '...'}
+              </CardTitle>
+              </CardHeader>
+              <CardContent>
+              <div className="space-y-4">
+                  {staff.map((s) => (
+                  <div
+                      key={s.id}
+                      className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
+                  >
+                      <div className="flex items-center gap-4">
+                          <Avatar>
+                              <AvatarImage src={`https://i.pravatar.cc/40?u=${s.id}`} />
+                              <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                              <p className="font-semibold">{s.name}</p>
+                              <p className="text-sm text-muted-foreground">{s.role}</p>
+                          </div>
+                      </div>
 
-                        <Select
-                        value={getAttendanceStatus(s.id)}
-                        onValueChange={(status: AttendanceStatus) =>
-                            handleAttendanceChange(s.id, status)
-                        }
-                        disabled={!date}
-                        >
-                        <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Set status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Present">Present</SelectItem>
-                            <SelectItem value="Absent">Absent</SelectItem>
-                            <SelectItem value="Half-Day">Half-Day</SelectItem>
-                        </SelectContent>
-                        </Select>
-                    </div>
-                    ))}
-                </div>
-                </CardContent>
-            </Card>
-            </div>
-        </div>
+                      <Select
+                      value={getAttendanceStatus(s.id)}
+                      onValueChange={(status: AttendanceStatus) =>
+                          handleAttendanceChange(s.id, status)
+                      }
+                      disabled={!date}
+                      >
+                      <SelectTrigger className="w-[140px]">
+                          <SelectValue placeholder="Set status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="Present">Present</SelectItem>
+                          <SelectItem value="Absent">Absent</SelectItem>
+                          <SelectItem value="Half-Day">Half-Day</SelectItem>
+                      </SelectContent>
+                      </Select>
+                  </div>
+                  ))}
+              </div>
+              </CardContent>
+          </Card>
+          </div>
       </div>
     </>
   );
