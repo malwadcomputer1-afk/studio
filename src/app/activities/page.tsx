@@ -1,88 +1,75 @@
 'use client';
-
 import { PageHeader } from '@/app/components/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialData } from '@/lib/mock-data';
 import { Activity } from '@/lib/types';
-import { format } from 'date-fns';
-import { useState, useMemo } from 'react';
+import { PlusCircle } from 'lucide-react';
+import { getColumns } from './components/columns';
+import { DataTable } from '@/app/staff/components/data-table';
+import { useState } from 'react';
+import { ActivityForm, ActivityFormValues } from './components/activity-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export default function ActivitiesPage() {
   const [activities, setActivities] = useLocalStorage<Activity[]>('activities', initialData.activities);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined);
 
-  const formattedDate = useMemo(() => format(selectedDate, 'yyyy-MM-dd'), [selectedDate]);
-
-  const currentActivity = useMemo(() => activities.find(a => a.date === formattedDate), [activities, formattedDate]);
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value) {
-      const [year, month, day] = e.target.value.split('-').map(Number);
-      setSelectedDate(new Date(year, month - 1, day));
+  const handleFormSubmit = (values: ActivityFormValues) => {
+    const title = values.notes.split('\n')[0].substring(0, 50) || `Note for ${values.date}`;
+    
+    if (editingActivity) {
+      setActivities(activities.map((act) => (act.id === editingActivity.id ? { ...editingActivity, ...values, title } : act)));
+    } else {
+      setActivities([...activities, { ...values, id: crypto.randomUUID(), title, staffIds: [] }]);
     }
+    closeDialog();
   };
 
-  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newNote = e.target.value;
-    const newTitle = newNote.split('\n')[0].substring(0, 50) || `Note for ${formattedDate}`;
-
-    setActivities(prevActivities => {
-      const existingActivity = prevActivities.find(a => a.date === formattedDate);
-
-      if (existingActivity) {
-        if (newNote === '') {
-          // If note is empty, remove the activity
-          return prevActivities.filter(a => a.id !== existingActivity.id);
-        }
-        // Update existing activity
-        return prevActivities.map(a => 
-          a.id === existingActivity.id ? { ...a, notes: newNote, title: newTitle } : a
-        );
-      } else if (newNote !== '') {
-        // Create new activity
-        const newActivity: Activity = {
-          id: crypto.randomUUID(),
-          date: formattedDate,
-          title: newTitle,
-          notes: newNote,
-          staffIds: [],
-        };
-        return [...prevActivities, newActivity];
-      }
-      return prevActivities;
-    });
+  const handleEdit = (activity: Activity) => {
+    setEditingActivity(activity);
+    setOpen(true);
   };
+
+  const handleDelete = (activityId: string) => {
+    setActivities(activities.filter((act) => act.id !== activityId));
+  };
+  
+  const closeDialog = () => {
+    setOpen(false);
+    setEditingActivity(undefined);
+  }
+
+  const columns = getColumns({ onEdit: handleEdit, onDelete: handleDelete });
 
   return (
     <>
-      <PageHeader
-        title="Daily Notepad"
-        description="Log your daily activities and notes here. Your notes are saved automatically."
-      />
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CardTitle>Notes for {format(selectedDate, 'MMMM d, yyyy')}</CardTitle>
-            <Input
-              type="date"
-              value={formattedDate}
-              onChange={handleDateChange}
-              className="w-full sm:w-[180px]"
+      <PageHeader title="Activity Notes" description="Log your daily activities and notes here.">
+        <Dialog open={open} onOpenChange={ (isOpen) => { if (!isOpen) closeDialog(); else setOpen(true); }}>
+          <DialogTrigger asChild>
+            <Button onClick={() => { setEditingActivity(undefined); setOpen(true); }}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Note
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>{editingActivity ? 'Edit Note' : 'Add New Note'}</DialogTitle>
+            </DialogHeader>
+            <ActivityForm 
+              onSubmit={handleFormSubmit}
+              onCancel={closeDialog}
+              activity={editingActivity} 
             />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            placeholder="Start writing your notes for the selected date..."
-            className="min-h-[400px] resize-y"
-            value={currentActivity?.notes || ''}
-            onChange={handleNoteChange}
-          />
-        </CardContent>
-      </Card>
+          </DialogContent>
+        </Dialog>
+      </PageHeader>
+      <DataTable 
+        columns={columns} 
+        data={activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
+        filterColumn={{id: 'title', placeholder: 'Filter by title...'}}
+      />
     </>
   );
 }
