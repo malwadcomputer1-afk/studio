@@ -22,7 +22,7 @@ function Calendar({
       className={cn("p-3", className)}
       weekStartsOn={1}
       formatters={{
-        formatWeekdayName: (day) => format(day, 'EEEEEE'),
+        formatWeekdayName: (day) => format(day, 'EEEEE'),
       }}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
