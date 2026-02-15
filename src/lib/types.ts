@@ -29,7 +29,7 @@ export interface Activity {
 
 export interface Expense {
   id: string;
-  item: string;
+  service: string;
   amount: number;
   date: string; // YYYY-MM-DD
 }

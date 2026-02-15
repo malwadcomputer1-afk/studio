@@ -66,7 +66,7 @@ export default function ExpensesPage() {
       <DataTable 
         columns={columns} 
         data={expenses} 
-        filterColumn={{id: 'item', placeholder: 'Filter by item...'}}
+        filterColumn={{id: 'service', placeholder: 'Filter by service...'}}
       />
     </>
   );

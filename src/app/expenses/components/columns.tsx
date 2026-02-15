@@ -29,8 +29,8 @@ export const getColumns = ({
     cell: ({ row }) => format(new Date(row.getValue('date')), 'MMM d, yyyy')
   },
   {
-    accessorKey: 'item',
-    header: 'Item',
+    accessorKey: 'service',
+    header: 'Service',
   },
   {
     accessorKey: 'amount',

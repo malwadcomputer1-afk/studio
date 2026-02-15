@@ -16,8 +16,8 @@ import { Expense } from '@/lib/types';
 import { format } from 'date-fns';
 
 const formSchema = z.object({
-  item: z.string().min(2, {
-    message: 'Item name must be at least 2 characters.',
+  service: z.string().min(2, {
+    message: 'Service name must be at least 2 characters.',
   }),
   amount: z.coerce.number().positive('Amount must be a positive number.'),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
@@ -38,7 +38,7 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
         ...expense,
         amount: Number(expense.amount)
     } : {
-      item: '',
+      service: '',
       amount: 0,
       date: format(new Date(), 'yyyy-MM-dd'),
     },
@@ -53,12 +53,12 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="item"
+          name="service"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Item/Service</FormLabel>
+              <FormLabel>Service/Item</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Corn Seeds" {...field} />
+                <Input placeholder="e.g., Tractor Repair" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
