@@ -15,7 +15,7 @@ export function AppLogo({ className }: { className?: string }) {
           dominantBaseline="middle"
           textAnchor="middle"
           fontFamily="Merriweather, serif"
-          fontSize="60"
+          fontSize="80"
           fontWeight="bold"
           fill="hsl(var(--primary-foreground))"
         >
