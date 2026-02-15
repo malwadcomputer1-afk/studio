@@ -97,12 +97,11 @@ export default function AttendancePage() {
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <div className="md:col-span-1 flex flex-col gap-6">
             <Card>
-                <CardContent className="p-0 flex justify-center">
+                <CardContent className="p-0">
                     <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
-                        className="rounded-md"
                         disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
                         modifiers={{ present: daysWithSomePresent }}
                         modifiersClassNames={{ present: 'has-attendance-dot' }}
