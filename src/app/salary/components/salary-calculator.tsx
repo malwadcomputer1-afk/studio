@@ -193,6 +193,7 @@ export function SalaryCalculator() {
                     {new Intl.NumberFormat('en-IN', {
                         style: 'currency',
                         currency: 'INR',
+                        currencyDisplay: 'symbol',
                     }).format(result.calculatedSalary)}
                  </p>
                </div>

@@ -41,6 +41,7 @@ export const getColumns = ({ staff, onEdit, onDelete }: GetColumnsProps): Column
       const formatted = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
+        currencyDisplay: 'symbol',
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;
