@@ -140,7 +140,7 @@ export default function AttendancePage() {
           <div className="md:col-span-2">
           <Card>
               <CardHeader>
-              <CardTitle>
+              <CardTitle className="text-center">
                   Staff
               </CardTitle>
               </CardHeader>
