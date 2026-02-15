@@ -97,14 +97,23 @@ export default function AttendancePage() {
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <div className="md:col-span-1 flex flex-col gap-6">
             <Card>
+                <CardHeader className="bg-destructive text-destructive-foreground rounded-t-lg p-4">
+                    <CardTitle className="text-center">Calendar</CardTitle>
+                </CardHeader>
                 <CardContent className="p-0">
                     <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
                         disabled={(d) => d > new Date() || d < new Date("2020-01-01")}
-                        modifiers={{ present: daysWithSomePresent }}
-                        modifiersClassNames={{ present: 'has-attendance-dot' }}
+                        modifiers={{ 
+                            present: daysWithSomePresent,
+                            weekend: day => day.getDay() === 0 || day.getDay() === 6
+                        }}
+                        modifiersClassNames={{ 
+                            present: 'has-attendance-dot',
+                            weekend: 'text-destructive'
+                        }}
                     />
                 </CardContent>
             </Card>
