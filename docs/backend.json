@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "Staff": {
+      "title": "Staff",
+      "description": "A staff member of the farm.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "yearlySalary": { "type": "number" },
+        "contact": { "type": "string" },
+        "joiningDate": { "type": "string", "format": "date" }
+      },
+      "required": ["name", "role", "yearlySalary", "contact", "joiningDate"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "An attendance record for a staff member.",
+      "type": "object",
+      "properties": {
+        "staffId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["Present", "Absent", "Half-Day"] },
+        "hoursWorked": { "type": "number" }
+      },
+      "required": ["staffId", "date", "status"]
+    },
+    "Activity": {
+      "title": "Activity",
+      "description": "A daily activity or note.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "notes": { "type": "string" },
+        "staffIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "date", "notes"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "A farm-related expense.",
+      "type": "object",
+      "properties": {
+        "service": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["service", "amount", "date"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "A salary payment to a staff member.",
+      "type": "object",
+      "properties": {
+        "staffId": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "notes": { "type": "string" }
+      },
+      "required": ["staffId", "amount", "date"]
+    }
+  },
+  "auth": {
+    "providers": []
+  },
+  "firestore": {
+    "/staff/{staffId}": {
+      "schema": { "$ref": "#/entities/Staff" },
+      "description": "Staff member profiles."
+    },
+    "/attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/Attendance" },
+      "description": "Attendance records."
+    },
+    "/activities/{activityId}": {
+      "schema": { "$ref": "#/entities/Activity" },
+      "description": "Activity logs."
+    },
+    "/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/Expense" },
+      "description": "Expense records."
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Payment records."
+    }
+  }
+}
