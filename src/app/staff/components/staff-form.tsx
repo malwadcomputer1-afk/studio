@@ -21,7 +21,7 @@ const formSchema = z.object({
   }),
   role: z.string().min(2, 'Role is required.'),
   yearlySalary: z.coerce.number().positive('Salary must be a positive number.'),
-  contact: z.string().email('Invalid email address.'),
+  contact: z.string().min(10, { message: 'Contact number must be at least 10 digits.' }),
   joiningDate: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
 });
 
@@ -96,9 +96,9 @@ export function StaffForm({ staff, onSubmit }: StaffFormProps) {
           name="contact"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Email</FormLabel>
+              <FormLabel>Contact Number</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="name@example.com" {...field} />
+                <Input type="tel" placeholder="e.g., 9876543210" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

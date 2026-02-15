@@ -11,7 +11,7 @@ export const initialData: FarmData = {
       role: 'Farm Manager',
       yearlySalary: 60000,
       hourlyRate: 28.85,
-      contact: 'john.doe@example.com',
+      contact: '9876543210',
       joiningDate: '2022-01-15',
     },
     {
@@ -20,7 +20,7 @@ export const initialData: FarmData = {
       role: 'Field Worker',
       yearlySalary: 40000,
       hourlyRate: 19.23,
-      contact: 'jane.smith@example.com',
+      contact: '9876543211',
       joiningDate: '2023-03-20',
     },
     {
@@ -29,7 +29,7 @@ export const initialData: FarmData = {
         role: 'Tractor Operator',
         yearlySalary: 48000,
         hourlyRate: 23.08,
-        contact: 'peter.jones@example.com',
+        contact: '9876543212',
         joiningDate: '2022-07-11',
       },
   ],
