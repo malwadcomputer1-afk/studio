@@ -153,7 +153,6 @@ export default function AttendancePage() {
                   >
                       <div className="flex items-center gap-4">
                           <Avatar>
-                              <AvatarImage src={`https://i.pravatar.cc/40?u=${s.id}`} />
                               <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
                           </Avatar>
                           <div>
