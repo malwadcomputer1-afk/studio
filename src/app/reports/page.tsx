@@ -6,20 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import useLocalStorage from '@/hooks/use-local-storage';
 import { generateExpensesPdf, generatePaymentsPdf, generateAttendancePdf } from '@/lib/pdf-generator';
 import { Expense, Payment, Staff, Attendance } from '@/lib/types';
-import { FileDown, User, CalendarDays, Mail, Send } from 'lucide-react';
+import { FileDown, User, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
-import { useState } from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
 
 export default function ReportsPage() {
   const [expenses] = useLocalStorage<Expense[]>('expenses', []);
   const [payments] = useLocalStorage<Payment[]>('payments', []);
   const [staff] = useLocalStorage<Staff[]>('staff', []);
   const [attendance] = useLocalStorage<Attendance[]>('attendance', []);
-  const [isEmailScheduled, setIsEmailScheduled] = useState(false);
-  const { toast } = useToast();
 
   const handleDownloadExpenses = () => {
     generateExpensesPdf(expenses);
@@ -42,13 +36,6 @@ export default function ReportsPage() {
       : attendance;
     
     generateAttendancePdf(filteredAttendance, staff, today, staffMember);
-  };
-
-  const handleQuickSend = () => {
-    toast({
-      title: 'Reports Sent!',
-      description: 'A copy of all reports has been sent to malwadcomputer1@gmail.com.',
-    });
   };
 
   return (
@@ -150,43 +137,6 @@ export default function ReportsPage() {
              {attendance.length === 0 && (
                 <p className="text-sm text-muted-foreground pt-4">No attendance data available to generate a report.</p>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Automated Email Reports</CardTitle>
-            <CardDescription>
-              Send reports to a registered email address, either on a schedule or instantly.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="email-schedule"
-                checked={isEmailScheduled}
-                onCheckedChange={setIsEmailScheduled}
-              />
-              <Label htmlFor="email-schedule">Enable Monthly Reports</Label>
-            </div>
-            {isEmailScheduled && (
-              <div className="flex items-center text-sm text-muted-foreground p-3 bg-muted rounded-md">
-                <Mail className="mr-2 h-4 w-4 flex-shrink-0" />
-                <div className="flex flex-col">
-                  <span>Reports will be sent to:</span>
-                  <span className="font-medium text-foreground">malwadcomputer1@gmail.com</span>
-                </div>
-              </div>
-            )}
-            <div className="border-t pt-4 space-y-2">
-              <Button onClick={handleQuickSend} className="w-full">
-                <Send className="mr-2 h-4 w-4" />
-                Quick Send Now
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Instantly send all reports to the email above.
-              </p>
-            </div>
           </CardContent>
         </Card>
 
