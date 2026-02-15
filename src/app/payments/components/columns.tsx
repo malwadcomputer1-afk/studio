@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
@@ -16,9 +17,11 @@ import { Badge } from '@/components/ui/badge';
 type GetColumnsProps = {
   staff: Staff[];
   onUpdateStatus: (paymentId: string, status: 'Paid' | 'Pending') => void;
+  onEdit: (payment: Payment) => void;
+  onDelete: (paymentId: string) => void;
 };
 
-export const getColumns = ({ staff, onUpdateStatus }: GetColumnsProps): ColumnDef<Payment>[] => [
+export const getColumns = ({ staff, onUpdateStatus, onEdit, onDelete }: GetColumnsProps): ColumnDef<Payment>[] => [
   {
     accessorKey: 'staffId',
     header: 'Staff Member',
@@ -72,6 +75,10 @@ export const getColumns = ({ staff, onUpdateStatus }: GetColumnsProps): ColumnDe
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => onEdit(payment)}>
+                    Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 {payment.status === 'Pending' && (
                     <DropdownMenuItem onClick={() => onUpdateStatus(payment.id, 'Paid')}>
                         Mark as Paid
@@ -82,6 +89,13 @@ export const getColumns = ({ staff, onUpdateStatus }: GetColumnsProps): ColumnDe
                         Mark as Pending
                     </DropdownMenuItem>
                 )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                className="text-destructive"
+                onClick={() => onDelete(payment.id)}
+                >
+                Delete
+                </DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
         </div>
