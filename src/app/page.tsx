@@ -56,9 +56,6 @@ export default function DashboardPage() {
           </h1>
           <div className="w-7 h-7 md:hidden" />
         </div>
-        <p className="mt-1 text-center text-muted-foreground">
-          {`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
-        </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
