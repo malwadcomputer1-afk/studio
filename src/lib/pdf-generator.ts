@@ -5,7 +5,7 @@ import autoTable from 'jspdf-autotable';
 import { Expense, Payment, Staff } from './types';
 import { format } from 'date-fns';
 
-const generatePdf = (title: string, head: any[], body: any[], fileName: string) => {
+const generatePdf = (title: string, head: any[], body: any[], fileName: string, total?: number) => {
   const doc = new jsPDF();
 
   doc.text(title, 14, 20);
@@ -16,6 +16,13 @@ const generatePdf = (title: string, head: any[], body: any[], fileName: string) 
     theme: 'striped',
     headStyles: { fillColor: [107, 142, 35] }, // Olive Drab
   });
+
+  if (total !== undefined) {
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total: ${total.toLocaleString()}`, 14, finalY + 10);
+  }
 
   doc.save(`${fileName}.pdf`);
 };
@@ -28,7 +35,8 @@ export const generateExpensesPdf = (expenses: Expense[]) => {
     exp.amount.toLocaleString(),
   ]);
   
-  generatePdf('Expense Report', head, body, `expense-report-${format(new Date(), 'yyyy-MM-dd')}`);
+  const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+  generatePdf('Expense Report', head, body, `expense-report-${format(new Date(), 'yyyy-MM-dd')}`, totalAmount);
 };
 
 export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
@@ -47,24 +55,26 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
       : `payments-report-all-${format(new Date(), 'yyyy-MM-dd')}`;
 
     const head = isSingleStaffReport
-      ? [['Date', 'Amount', 'Notes']]
-      : [['Date', 'Staff Member', 'Amount', 'Notes']];
+      ? [['Notes', 'Amount', 'Date']]
+      : [['Staff Member', 'Notes', 'Amount', 'Date']];
       
     const body = payments.map(p => {
         if (isSingleStaffReport) {
             return [
-                format(new Date(p.date), 'MMM d, yyyy'),
-                p.amount.toLocaleString(),
                 p.notes || '',
+                p.amount.toLocaleString(),
+                format(new Date(p.date), 'MMM d, yyyy'),
             ];
         }
         return [
-            format(new Date(p.date), 'MMM d, yyyy'),
             staffMap.get(p.staffId) || 'Unknown',
-            p.amount.toLocaleString(),
             p.notes || '',
+            p.amount.toLocaleString(),
+            format(new Date(p.date), 'MMM d, yyyy'),
         ];
     });
+    
+    const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
 
-    generatePdf(reportTitle, head, body, fileName);
+    generatePdf(reportTitle, head, body, fileName, totalAmount);
 };
