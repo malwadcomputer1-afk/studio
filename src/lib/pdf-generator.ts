@@ -2,7 +2,7 @@
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Expense, Payment, Staff } from './types';
+import { Expense, Payment, Staff, Attendance, AttendanceStatus } from './types';
 import { format } from 'date-fns';
 
 const generatePdf = (title: string, head: any[], body: any[], fileName: string, total?: number) => {
@@ -43,8 +43,6 @@ export const generateExpensesPdf = (expenses: Expense[]) => {
 export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
     const staffMap = new Map(staff.map(s => [s.id, s.name]));
     
-    // A report is for a single staff member if only one staff member is provided
-    // and all payments belong to them.
     const isSingleStaffReport = staff.length === 1 && payments.every(p => p.staffId === staff[0].id);
 
     const reportTitle = isSingleStaffReport
@@ -80,4 +78,80 @@ export const generatePaymentsPdf = (payments: Payment[], staff: Staff[]) => {
     const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
 
     generatePdf(reportTitle, head, body, fileName, totalAmount);
+};
+
+export const generateAttendancePdf = (
+  attendance: Attendance[],
+  staff: Staff[],
+  month: Date,
+  staffMember?: Staff
+) => {
+  const staffMap = new Map(staff.map(s => [s.id, s.name]));
+  const monthName = format(month, 'MMMM yyyy');
+
+  const reportTitle = staffMember
+    ? `Attendance Report for ${staffMember.name} - ${monthName}`
+    : `Monthly Attendance Report - ${monthName}`;
+
+  const fileName = staffMember
+    ? `attendance-report-${staffMember.name.toLowerCase().replace(/ /g, '-')}-${format(month, 'yyyy-MM')}`
+    : `attendance-report-all-${format(month, 'yyyy-MM')}`;
+
+  const head = staffMember
+    ? [['Sr. No.', 'Date', 'Status', 'Hours Worked']]
+    : [['Sr. No.', 'Date', 'Staff Member', 'Status', 'Hours Worked']];
+
+  const body = attendance.map((att, index) => {
+    const row: (string | number)[] = [
+        index + 1,
+        format(new Date(att.date), 'MMM d, yyyy'),
+    ];
+    if (!staffMember) {
+        row.push(staffMap.get(att.staffId) || 'Unknown');
+    }
+    row.push(
+        att.status,
+        att.hoursWorked?.toString() || 'N/A'
+    );
+    return row;
+  });
+
+  const doc = new jsPDF();
+  doc.text(reportTitle, 14, 20);
+  autoTable(doc, {
+    head,
+    body,
+    startY: 25,
+    theme: 'grid',
+    headStyles: { fillColor: [107, 142, 35] },
+  });
+
+  if (staffMember) {
+    const summary: Record<AttendanceStatus, number> = {
+      'Present': 0,
+      'Absent': 0,
+      'Half-Day': 0,
+      'Overtime': 0,
+    };
+    attendance.forEach(att => {
+        summary[att.status]++;
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Summary', 14, finalY + 10);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    let summaryY = finalY + 17;
+    (Object.keys(summary) as AttendanceStatus[]).forEach(status => {
+      if (summary[status] > 0) {
+        doc.text(`${status}: ${summary[status]} days`, 14, summaryY);
+        summaryY += 7;
+      }
+    });
+  }
+
+
+  doc.save(`${fileName}.pdf`);
 };
