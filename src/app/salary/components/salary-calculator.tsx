@@ -189,7 +189,12 @@ export function SalaryCalculator() {
              <div className="space-y-4">
                <div>
                  <p className="text-sm text-muted-foreground">Total Salary</p>
-                 <p className="text-3xl font-bold text-primary">₹{result.calculatedSalary.toLocaleString('en-IN')}</p>
+                 <p className="text-3xl font-bold text-primary">
+                    {new Intl.NumberFormat('en-IN', {
+                        style: 'currency',
+                        currency: 'INR',
+                    }).format(result.calculatedSalary)}
+                 </p>
                </div>
                 <div className="prose prose-sm max-w-none text-foreground prose-p:my-1 prose-headings:my-2 prose-headings:font-headline">
                     <h3 className="font-semibold">Breakdown:</h3>
