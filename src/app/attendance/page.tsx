@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useState, type ChangeEvent } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -25,8 +26,9 @@ export default function AttendancePage() {
     initialData.attendance
   );
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [pendingChanges, setPendingChanges] = useState<Record<string, AttendanceStatus>>({});
 
-  const handleAttendanceChange = (
+  const handleAttendanceSave = (
     staffId: string,
     status: AttendanceStatus
   ) => {
@@ -39,21 +41,37 @@ export default function AttendancePage() {
     let newAttendance = [...attendance];
 
     if (existingRecordIndex > -1) {
-      newAttendance[existingRecordIndex] = {
-        ...newAttendance[existingRecordIndex],
-        status,
-        hoursWorked: status === 'Present' ? 8 : status === 'Half-Day' ? 4 : 0,
-      };
+      if (status === 'Absent') {
+        newAttendance.splice(existingRecordIndex, 1);
+      } else {
+        newAttendance[existingRecordIndex] = {
+          ...newAttendance[existingRecordIndex],
+          status,
+          hoursWorked: status === 'Present' ? 8 : status === 'Half-Day' ? 4 : 0,
+        };
+      }
     } else {
-      newAttendance.push({
-        id: crypto.randomUUID(),
-        staffId,
-        date: formattedDate,
-        status,
-        hoursWorked: status === 'Present' ? 8 : status === 'Half-Day' ? 4 : 0,
-      });
+      if (status !== 'Absent') {
+        newAttendance.push({
+          id: crypto.randomUUID(),
+          staffId,
+          date: formattedDate,
+          status,
+          hoursWorked: status === 'Present' ? 8 : status === 'Half-Day' ? 4 : 0,
+        });
+      }
     }
     setAttendance(newAttendance);
+    // Remove from pending changes after saving
+    setPendingChanges(prev => {
+        const updatedChanges = { ...prev };
+        delete updatedChanges[staffId];
+        return updatedChanges;
+    });
+  };
+
+  const handleAttendanceSelectionChange = (staffId: string, status: AttendanceStatus) => {
+    setPendingChanges(prev => ({...prev, [staffId]: status}));
   };
 
   const getAttendanceStatus = (staffId: string): AttendanceStatus => {
@@ -84,6 +102,7 @@ export default function AttendancePage() {
         // Adding 'T00:00:00' ensures the date is parsed in the user's local timezone
         const newDate = new Date(event.target.value + 'T00:00:00');
         setDate(newDate);
+        setPendingChanges({});
     } else {
         setDate(undefined);
     }
@@ -120,41 +139,50 @@ export default function AttendancePage() {
               </CardHeader>
               <CardContent>
               <div className="space-y-4">
-                  {staff.map((s) => (
-                  <div
-                      key={s.id}
-                      className="flex flex-col md:flex-row md:items-center md:justify-between p-2 rounded-md hover:bg-muted gap-2"
-                  >
-                      <div className="flex items-center gap-4">
-                          <Avatar>
-                              <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                              <p className="font-semibold">{s.name}</p>
-                              <p className="text-sm text-muted-foreground">{s.role}</p>
+                  {staff.map((s) => {
+                    const savedStatus = getAttendanceStatus(s.id);
+                    const selectedStatus = pendingChanges[s.id] || savedStatus;
+                    const hasPendingChange = selectedStatus !== savedStatus;
+                    
+                    return (
+                      <div
+                          key={s.id}
+                          className="flex flex-col md:flex-row md:items-center md:justify-between p-2 rounded-md hover:bg-muted gap-2"
+                      >
+                          <div className="flex items-center gap-4">
+                              <Avatar>
+                                  <AvatarFallback>{getInitials(s.name)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                  <p className="font-semibold">{s.name}</p>
+                                  <p className="text-sm text-muted-foreground">{s.role}</p>
+                              </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                            <Select
+                              value={selectedStatus}
+                              onValueChange={(status: AttendanceStatus) =>
+                                handleAttendanceSelectionChange(s.id, status)
+                              }
+                              disabled={!date}
+                            >
+                              <SelectTrigger className="w-full md:w-[140px]">
+                                  <SelectValue placeholder="Set status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                  <SelectItem value="Present">Present</SelectItem>
+                                  <SelectItem value="Absent">Absent</SelectItem>
+                                  <SelectItem value="Half-Day">Half-Day</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {hasPendingChange && date && (
+                              <Button size="sm" onClick={() => handleAttendanceSave(s.id, selectedStatus)}>Save</Button>
+                            )}
                           </div>
                       </div>
-
-                      <div className="w-full md:w-auto mt-2 md:mt-0">
-                        <Select
-                        value={getAttendanceStatus(s.id)}
-                        onValueChange={(status: AttendanceStatus) =>
-                            handleAttendanceChange(s.id, status)
-                        }
-                        disabled={!date}
-                        >
-                        <SelectTrigger className="w-full md:w-[140px]">
-                            <SelectValue placeholder="Set status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Present">Present</SelectItem>
-                            <SelectItem value="Absent">Absent</SelectItem>
-                            <SelectItem value="Half-Day">Half-Day</SelectItem>
-                        </SelectContent>
-                        </Select>
-                      </div>
-                  </div>
-                  ))}
+                    );
+                  })}
               </div>
               </CardContent>
           </Card>
