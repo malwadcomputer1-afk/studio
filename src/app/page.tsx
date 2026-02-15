@@ -9,7 +9,6 @@ import {
   Users,
   CalendarCheck,
   CreditCard,
-  Sprout,
   ClipboardList,
   Landmark,
 } from 'lucide-react';
@@ -34,8 +33,6 @@ export default function DashboardPage() {
   const presentToday = todayAttendance.filter(
     (a) => a.status === 'Present'
   ).length;
-
-  const todayActivitiesCount = activities.filter((a) => isToday(new Date(a.date))).length;
 
   const totalExpensesThisMonth = expenses
     .filter(
@@ -68,16 +65,6 @@ export default function DashboardPage() {
           title="Pending Payments"
           value={"0"}
           icon={CreditCard}
-        />
-        <StatCard
-          title="Active Crops"
-          value={"0"}
-          icon={Sprout}
-        />
-        <StatCard
-          title="Today's Activities"
-          value={todayActivitiesCount.toString()}
-          icon={ClipboardList}
         />
         <StatCard
           title="Month Expenses"
