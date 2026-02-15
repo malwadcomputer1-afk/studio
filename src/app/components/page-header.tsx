@@ -13,13 +13,13 @@ export function PageHeader({
 }) {
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-      <div className="flex items-center justify-between w-full md:w-auto">
+      <div className="flex items-center gap-4">
+        <div className="md:hidden">
+          <SidebarTrigger />
+        </div>
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">{title}</h1>
           {description && <p className="text-muted-foreground mt-1">{description}</p>}
-        </div>
-        <div className="md:hidden ml-4">
-          <SidebarTrigger />
         </div>
       </div>
       <div className="flex-shrink-0 self-end md:self-auto">{children}</div>
