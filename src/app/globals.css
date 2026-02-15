@@ -114,11 +114,11 @@
   .has-attendance-dot .rdp-button::after {
     content: '';
     position: absolute;
-    bottom: 6px;
+    bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background-color: hsl(var(--primary) / 0.6);
   }

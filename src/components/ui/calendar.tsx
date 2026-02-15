@@ -19,7 +19,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-2", className)}
       weekStartsOn={1}
       formatters={{
         formatWeekdayName: (day) => format(day, 'cccccc'),
@@ -32,19 +32,19 @@ function Calendar({
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-6 w-6 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse border divide-y",
         head_row: "flex divide-x",
         head_cell:
-          "text-muted-foreground text-center font-normal text-[0.8rem] p-2",
+          "text-muted-foreground text-center font-normal text-[0.8rem] p-1",
         row: "flex w-full divide-x",
-        cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+        cell: "text-center text-xs p-0 relative focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-full p-0 font-normal aria-selected:opacity-100 rounded-none"
+          "h-8 w-full p-0 font-normal aria-selected:opacity-100 rounded-none"
         ),
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
