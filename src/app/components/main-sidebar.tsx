@@ -18,6 +18,7 @@ import {
   Tractor,
   DollarSign,
   Leaf,
+  FileDown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -29,6 +30,7 @@ const menuItems = [
   { href: "/expenses", label: "Expenses", icon: DollarSign },
   { href: "/salary", label: "Salary", icon: ClipboardPenLine },
   { href: "/payments", label: "Payments", icon: Landmark },
+  { href: "/reports", label: "Reports", icon: FileDown },
 ];
 
 export function MainSidebar({ pathname }: { pathname: string }) {
