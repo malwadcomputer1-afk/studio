@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
 
 export default function AttendancePage() {
   const [staff] = useLocalStorage<Staff[]>('staff', initialData.staff);
@@ -83,6 +83,18 @@ export default function AttendancePage() {
     return acc;
   }, {} as Record<AttendanceStatus, number>);
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value) {
+      // The input value is a string like 'YYYY-MM-DD'.
+      // To avoid timezone issues where `new Date('...')` can be off by a day,
+      // we construct the date from its parts, which creates it in the local timezone.
+      const [year, month, day] = e.target.value.split('-').map(Number);
+      setDate(new Date(year, month - 1, day));
+    } else {
+      setDate(undefined);
+    }
+  };
+
   return (
     <>
       <PageHeader
@@ -91,12 +103,19 @@ export default function AttendancePage() {
       />
       <div className="grid md:grid-cols-3 gap-6 items-start">
           <div className="md:col-span-1 space-y-6">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-              />
+              <Card>
+                <CardHeader>
+                    <CardTitle>Select Date</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Input
+                        type="date"
+                        value={date ? format(date, 'yyyy-MM-dd') : ''}
+                        onChange={handleDateChange}
+                    />
+                </CardContent>
+              </Card>
+
               {date && (
               <Card>
                   <CardHeader>
