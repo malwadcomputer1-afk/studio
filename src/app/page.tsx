@@ -1,7 +1,7 @@
 'use client';
-import { PageHeader } from '@/app/components/page-header';
 import { StatCard } from '@/app/components/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialData } from '@/lib/mock-data';
 import { Activity, Attendance, Expense, Staff } from '@/lib/types';
@@ -46,10 +46,17 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageHeader
-        title="Welcome to Malwad Farm"
-        description={`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
-      />
+      <div className="relative flex flex-col items-center mb-6 text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">
+          Malwad Farm
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          {`${format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your farm at a glance.`}
+        </p>
+        <div className="absolute top-0 right-0 md:hidden">
+          <SidebarTrigger />
+        </div>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Staff"
